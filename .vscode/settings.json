@@ -24,6 +24,8 @@
     "Ilshidur",
     "incidentio",
     "jsdom",
+    "jsons",
+    "knex",
     "llms",
     "Milvus",
     "msgpackr",

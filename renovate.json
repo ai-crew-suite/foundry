@@ -1,0 +1,73 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
+  "schedule": ["on tuesday"],
+  "customManagers": [
+    {
+      "description": "Extract and update the version inside the root backstage.json file",
+      "customType": "regex",
+      "fileMatch": ["^backstage\\.json\$"],
+      "matchStrings": ["\"version\":\\s*\"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "@backstage/core",
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Enforce version range constraints for targeted Yarn catalog entries",
+      "matchDepTypes": ["catalogs:dev", "catalogs:prod"],
+      "matchPackageNames": ["@types/react", "@types/react-dom"],
+      "allowedVersions": "^18"
+    },
+    {
+      "description": "Enforce version range constraints for targeted Yarn catalog entries",
+      "matchDepTypes": ["catalogs:dev", "catalogs:prod"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "^6"
+    },
+    {
+      "description": "Mute internal action noise: block minor, patch, and digest updates entirely",
+      "matchManagers": ["github-actions"],
+      "matchPackagePatterns": ["^ai-crew-suite/actions"],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "enabled": false
+    },
+    {
+      "description": "Allow major internal action updates, but prevent pinGitHubActionDigests from converting tags into SHAs",
+      "matchManagers": ["github-actions"],
+      "matchPackagePatterns": ["^ai-crew-suite/actions"],
+      "matchUpdateTypes": ["major"],
+      "pinDigests": false,
+      "groupName": "Internal Tooling Infrastructure"
+    },
+    {
+      "description": "Group and annotate upgrades modifying the production catalog to remind devs to increment the root version key",
+      "matchDepTypes": ["catalogs:prod", "dependencies"],
+      "groupName": "Production Runtime Dependencies",
+      "prBodyNotes": [
+        "### ⚠️ Testing Instructions for Consolidated Monorepo Upgrades",
+        "- [ ] Verify that the **Backstage IDP core plugin** still compiles properly.",
+        "- [ ] Run `turbo run build` across all sub-packages to check lockfile consistency.",
+        "- [ ] Ensure local Dev Mode launches successfully before merging.",
+        "---",
+        "### 🚀 Production Asset Update Detected",
+        "**Action Required**: This PR modifies production runtimes. Remember to **increment the version number** in the root `package.json` and release an updated Git tag so downstream consumer repositories pull the updated logic."
+      ]
+    },
+    {
+      "description": "Group and annotate upgrades modifying devDependencies or the dev catalog that they do NOT need a root version bump",
+      "matchDepTypes": ["catalogs:dev", "devDependencies"],
+      "groupName": "Development & Tooling Tools",
+      "prBodyNotes": [
+        "### ⚠️ Testing Instructions for Consolidated Monorepo Upgrades",
+        "- [ ] Run `turbo run build` across all sub-packages to check lockfile consistency.",
+        "---",
+        "### 🛠️ Internal Dev/Tooling Asset Update Detected",
+        "**Notice**: This PR only impacts local testing, linting, or internal developer utilities. The root repository version **should not be incremented** for this change."
+      ]
+    }
+  ]
+}

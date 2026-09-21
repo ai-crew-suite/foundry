@@ -1,4 +1,3 @@
-# Security policy for GitHub Security Advisories
 name: CodeQL Security Scanning
 
 on:
@@ -21,35 +20,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["javascript", "actions"]
+        language: ["javascript"] # Consumer plugin repositories only track application js/ts, not local action formats
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: 📂 Checkout Application Source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+      - name: 🔒 Execute Centralized CodeQL Scanners
+        uses: ai-crew-suite/actions/codeql@v1
         with:
-          languages: ${{ matrix.language }}
-          queries: +security-and-quality
-          config-file: ./.github/codeql/codeql-config.yml
-
-      - name: Autobuild
-        if: matrix.language == 'javascript'
-        uses: github/codeql-action/autobuild@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
-        with:
-          category: "/language:${{ matrix.language }}"
+          language: ${{ matrix.language }}
 
   hotfix-bypass:
     name: CodeQL Hotfix Bypass
     runs-on: ubuntu-latest
     if: ${{ startsWith(github.head_ref || github.ref_name, 'hotfix/') }}
-
     permissions: {}
-
     steps:
       - name: Skip CodeQL for hotfix branch
         run: echo "hotfix/* branch detected; skipping CodeQL but allowing deployments."
