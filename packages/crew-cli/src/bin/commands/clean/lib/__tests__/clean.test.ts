@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync, existsSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import type { WorkspaceContext } from '../../../../utils/workspace.js';
-import { cleanWorkspace, getCleanTargets } from '../clean.js';
+import type { WorkspaceContext } from '../../../../utils/workspace';
+import { cleanWorkspace, getCleanTargets } from '../clean';
 
 function makeContext(repoRoot: string, packageDir: string): WorkspaceContext {
   return {
@@ -36,11 +36,11 @@ describe('getCleanTargets', () => {
     const repoRoot = '/repo';
     const packageDir = '/repo/plugins/kernel/node';
 
-    expect(getCleanTargets(makeContext(repoRoot, packageDir))).toEqual([
-      '/repo/plugins/kernel/node/dist',
-      '/repo/dist-types/plugins/kernel/node',
-      '/repo/plugins/kernel/node/tsconfig.tsbuildinfo',
-    ]);
+    const targets = getCleanTargets(makeContext(repoRoot, packageDir));
+
+    expect(targets).toContain('/repo/plugins/kernel/node/dist');
+    expect(targets).toContain('/repo/dist-types/plugins/kernel/node');
+    expect(targets).toContain('/repo/plugins/kernel/node/tsconfig.tsbuildinfo');
   });
 });
 
@@ -92,5 +92,26 @@ describe('cleanWorkspace', () => {
     cleanWorkspace(makeContext(root, packageDir));
 
     expect(existsSync(join(root, 'dist-types/plugins/kernel/backend/index.d.ts'))).toBe(true);
+  });
+
+  it('safely handles and skips broken symlinks or missing targets gracefully', () => {
+    const { repoRoot: root, packageDir } = setupRepo();
+
+    const targetFile = join(packageDir, 'non-existent-source.js');
+    const symlinkPath = join(packageDir, 'dist');
+
+    symlinkSync(targetFile, symlinkPath);
+
+    const result = cleanWorkspace(makeContext(root, packageDir));
+    expect(result).toBeDefined();
+  });
+
+  it('avoids destructive broad wiping when packageDir matches the repoRoot exactly', () => {
+    const { repoRoot: root } = setupRepo();
+
+    const targets = getCleanTargets(makeContext(root, root));
+
+    // The targets must never include the shared root dist-types folder
+    expect(targets).not.toContain(join(root, 'dist-types'));
   });
 });

@@ -15,7 +15,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import type { WorkspaceContext } from '../../../utils/workspace.js';
+import type { WorkspaceContext } from '../../../utils/workspace';
 
 export interface CleanResult {
   /** Absolute paths that existed and were removed. */
@@ -30,11 +30,18 @@ export interface CleanResult {
 export function getCleanTargets(context: WorkspaceContext): string[] {
   const relativeFromRoot = path.relative(context.repoRoot, context.packageDir);
 
-  return [
+  const targets = [
     path.resolve(context.packageDir, 'dist'),
-    path.resolve(context.repoRoot, 'dist-types', relativeFromRoot),
     path.resolve(context.packageDir, 'tsconfig.tsbuildinfo'),
   ];
+
+  // Safety Guard: Only add a dist-types target if we are cleaning an isolated sub-package.
+  // Wiping out the root shared 'dist-types' would destructively purge all packages.
+  if (relativeFromRoot !== '') {
+    targets.push(path.resolve(context.repoRoot, 'dist-types', relativeFromRoot));
+  }
+
+  return targets;
 }
 
 /** Removes any existing build artifact targets for `context`. */
@@ -42,9 +49,14 @@ export function cleanWorkspace(context: WorkspaceContext): CleanResult {
   const removed: string[] = [];
 
   for (const target of getCleanTargets(context)) {
-    if (fs.existsSync(target)) {
-      fs.rmSync(target, { recursive: true, force: true });
-      removed.push(target);
+    try {
+      // Use lstatSync to find and catch dead symlinks that existsSync skips
+      if (fs.existsSync(target) || fs.lstatSync(target, { throwIfNoEntry: false })) {
+        fs.rmSync(target, { recursive: true, force: true });
+        removed.push(target);
+      }
+    } catch (error) {
+      console.warn(`\x1b[33m⚠️ Unable to clean target path completely:\x1b[0m ${target}`, error);
     }
   }
 

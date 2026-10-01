@@ -37,7 +37,8 @@ program
       }
     } catch (error) {
       console.error(`\x1b[31m❌ Failed to clear distribution directory:\x1b[0m`, error);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
   });
 
