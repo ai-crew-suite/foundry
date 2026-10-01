@@ -1,0 +1,34 @@
+{
+  "name": "@ai-crew-suite/renovate-shared-config",
+  "description": "Centralized, high-compliance Renovate dependency presets for the AI Crew Suite platform.",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "keywords": [
+    "ai-crew-suite",
+    "renovate",
+    "config",
+    "preset"
+  ],
+  "engines": {
+    "node": "22 || 24"
+  },
+  "packageManager": "yarn@4.18.0",
+  "bugs": {
+    "url": "https://github.com/ai-crew-suite/foundry/issues",
+    "email": "support@ai-crew-suite.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-crew-suite/foundry",
+    "directory": "packages/renovate-shared-config"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "main": "default.json",
+  "files": [
+    "default.json",
+    "README.md"
+  ]
+}

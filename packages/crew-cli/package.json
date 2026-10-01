@@ -1,0 +1,98 @@
+{
+  "name": "@ai-crew-suite/crew-cli",
+  "version": "0.0.1",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": "22 || 24"
+  },
+  "keywords": [
+    "ai-crew-suite",
+    "cli",
+    "crew"
+  ],
+  "packageManager": "yarn@4.18.0",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ai-crew-suite/foundry/issues",
+    "email": "support@ai-crew-suite.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ai-crew-suite/foundry",
+    "directory": "packages/crew-cli"
+  },
+  "bin": {
+    "crew": "./dist/bin/crew.js"
+  },
+  "exports": {
+    "./config/eslint": "./dist/bin/commands/lint/lib/factory.js",
+    "./storybook/mocks": "./src/bin/commands/storybook/lib/mockUtils.ts"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "yarn clean && rollup --config rollup.config.ts --configPlugin typescript",
+    "clean": "rimraf dist",
+    "lint": "node ./dist/bin/crew.js lint",
+    "publish": "npm publish",
+    "test": "yarn test:run",
+    "test:unit": "vitest run --config ./vitest.config.ts",
+    "test:unit:coverage": "vitest run --coverage --config ./vitest.config.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@backstage/cli": "catalog:prod",
+    "@backstage/core-components": "catalog:prod",
+    "@backstage/core-plugin-api": "catalog:prod",
+    "@backstage/eslint-plugin": "catalog:prod",
+    "@backstage/test-utils": "catalog:prod",
+    "@backstage/theme": "catalog:prod",
+    "@material-ui/core": "catalog:prod",
+    "@storybook/addon-docs": "catalog:prod",
+    "@storybook/addon-links": "catalog:prod",
+    "@storybook/react": "catalog:prod",
+    "@storybook/react-vite": "catalog:prod",
+    "@types/eslint-plugin-jsx-a11y": "catalog:prod",
+    "@typescript-eslint/eslint-plugin": "catalog:prod",
+    "@typescript-eslint/parser": "catalog:prod",
+    "@vitest/coverage-v8": "catalog:prod",
+    "chalk": "catalog:prod",
+    "commander": "catalog:prod",
+    "eslint": "catalog:prod",
+    "eslint-config-prettier": "catalog:prod",
+    "eslint-plugin-header": "catalog:prod",
+    "eslint-plugin-import-x": "catalog:prod",
+    "eslint-plugin-jest": "catalog:prod",
+    "eslint-plugin-jsx-a11y": "catalog:prod",
+    "eslint-plugin-react": "catalog:prod",
+    "eslint-plugin-react-hooks": "catalog:prod",
+    "eslint-plugin-storybook": "catalog:prod",
+    "eslint-plugin-unused-imports": "catalog:prod",
+    "jsdom": "catalog:prod",
+    "msw": "catalog:prod",
+    "msw-storybook-addon": "catalog:prod",
+    "react": "catalog:prod",
+    "react-dom": "catalog:prod",
+    "rimraf": "catalog:prod",
+    "storybook": "catalog:prod",
+    "tsc": "catalog:prod",
+    "tsx": "catalog:prod",
+    "typescript": "catalog:prod",
+    "typescript-eslint": "catalog:prod",
+    "vite": "catalog:prod",
+    "vite-plugin-tsconfig-paths": "catalog:prod",
+    "vitest": "catalog:prod"
+  },
+  "devDependencies": {
+    "@rollup/plugin-node-resolve": "catalog:dev",
+    "@rollup/plugin-typescript": "catalog:dev",
+    "@types/jest": "catalog:dev",
+    "@types/node": "catalog:dev",
+    "rollup": "catalog:dev"
+  }
+}

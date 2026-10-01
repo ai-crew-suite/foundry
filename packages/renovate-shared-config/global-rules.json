@@ -1,0 +1,104 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    "helpers:pinGitHubActionDigestsToSemver"
+  ],
+  "schedule": ["on tuesday"],
+  "customManagers": [
+    {
+      "description": "Extract and update the version inside the root backstage.json file",
+      "customType": "regex",
+      "fileMatch": ["^backstage\\.json"],
+      "matchStrings": ["\"version\":\\s*\"(?<currentValue>[^\"]+)\""],
+      "depNameTemplate": "@backstage/core",
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "CRITICAL PIN: Clamp React ecosystem to v18 to respect Backstage core restraint [#28080](https://github.com/backstage/backstage/issues/28080)",
+      "matchManagers": ["yarn-catalogs", "npm"],
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "allowedVersions": "^18.3.1"
+    },
+    {
+      "description": "CRITICAL PIN: Clamp testing infrastructure to React 18 compatible streams",
+      "matchManagers": ["yarn-catalogs"],
+      "matchPackageNames": ["@testing-library/react"],
+      "allowedVersions": "^15.0.0"
+    },
+    {
+      "description": "CRITICAL PIN: Clamp routing streams below v7 to preserve plugin relativeSplatPath behaviors",
+      "matchManagers": ["yarn-catalogs", "npm"],
+      "matchPackageNames": ["react-router", "react-router-dom"],
+      "allowedVersions": "^6.30.0"
+    },
+    {
+      "description": "CRITICAL PIN: Block Material UI v9+ to eliminate React 19 peer clashes",
+      "matchManagers": ["yarn-catalogs"],
+      "matchPackageNames": ["@mui/material"],
+      "allowedVersions": "^7.3.0"
+    },
+    {
+      "description": "CRITICAL PIN: Enforce version range constraints for TypeScript compiler targets",
+      "matchManagers": ["yarn-catalogs"],
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "^6.0.0"
+    },
+    {
+      "description": "Mute internal action noise: absorb minor/patch changes natively via moving major tags, but explicitly surface new major stream updates",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": [
+        "ai-crew-suite/actions",
+        "ai-crew-suite/actions/analyze-codeql"
+      ],
+      "matchUpdateTypes": ["minor", "patch", "digest"],
+      "enabled": false
+    },
+    {
+      "description": "Allow major internal action upgrades, ensuring they bypass the default pinGitHubActionDigests parser to keep floating major tags intact",
+      "matchManagers": ["github-actions"],
+      "matchPackageNames": [
+        "ai-crew-suite/actions",
+        "ai-crew-suite/actions/analyze-codeql"
+      ],
+      "matchUpdateTypes": ["major"],
+      "pinDigests": false,
+      "groupName": "Internal Tooling Infrastructure",
+      "prBodyNotes": [
+        "### 🚨 Upstream Action Breaking Change Detected",
+        "A new major version of our core pipeline infrastructure has been published.",
+        "Please review the **release notes** in the actions repository to verify if inputs, outputs, or configuration keys have shifted before merging."
+      ]
+    },
+    {
+      "description": "Group and annotate upgrades modifying the production catalog to remind devs to increment the root version key",
+      "matchManagers": ["yarn-catalogs"],
+      "matchDepTypes": ["yarn.catalog.prod"],
+      "groupName": "Production Runtime Dependencies",
+      "prBodyNotes": [
+        "### ⚠️ Testing Instructions for Consolidated Monorepo Upgrades",
+        "- [ ] Verify that the **Backstage IDP core plugin** still compiles properly.",
+        "- [ ] Run `turbo run build` across all sub-packages to check lockfile consistency.",
+        "- [ ] Ensure local Dev Mode launches successfully before merging.",
+        "---",
+        "### 🚀 Production Asset Update Detected",
+        "**Action Required**: This PR modifies production runtimes. Remember to **increment the version number** in the root `package.json` and release an updated Git tag so downstream consumer repositories pull the updated logic."
+      ]
+    },
+    {
+      "description": "Group and annotate upgrades modifying devDependencies or the dev catalog that they do NOT need a root version bump",
+      "matchManagers": ["yarn-catalogs", "npm"],
+      "matchDepTypes": ["yarn.catalog.dev"],
+      "groupName": "Development & Tooling Tools",
+      "prBodyNotes": [
+        "### ⚠️ Testing Instructions for Consolidated Monorepo Upgrades",
+        "- [ ] Run `turbo run build` across all sub-packages to check lockfile consistency.",
+        "---",
+        "### 🛠️ Internal Dev/Tooling Asset Update Detected",
+        "**Notice**: This PR only impacts local testing, linting, or internal developer utilities. The root repository version **should not be incremented** for this change."
+      ]
+    }
+  ]
+}
