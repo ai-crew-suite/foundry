@@ -13,33 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// 📂 packages/cli/src/bin/commands/storybook-build/index.ts
 import { Command } from 'commander';
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import chalk from 'chalk';
+import { runStorybookBuildPipeline } from './lib/orchestrate';
 
 const program = new Command();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
   .name('storybook:build')
   .description('Compile a static distribution build of the workspace documentation stories')
   .allowUnknownOption(true)
   .action(() => {
-    console.log(`${chalk.green('📦 AI CREW SUITE: Compiling static documentation artifact layers...')}`);
-
-    const internalConfigDir = path.resolve(__dirname, '../storybook/config');
-    const forwardedArgs = process.argv.slice(3);
-
-    const result = spawnSync('yarn', ['storybook', 'build', '--config-dir', internalConfigDir, ...forwardedArgs], {
-      stdio: 'inherit',
-      shell: true,
-      cwd: path.resolve(__dirname, '../../../../')
-    });
-
-    process.exit(result.status ?? 0);
+    try {
+      const forwardedArgs = process.argv.slice(3);
+      runStorybookBuildPipeline(forwardedArgs);
+    } catch (error) {
+      console.error(`\x1b[31m❌ Core storybook-build orchestration framework error:\x1b[0m`, error);
+      process.exitCode = 1;
+    }
   });
 
 program.parse(process.argv);

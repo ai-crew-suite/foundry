@@ -17,7 +17,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { findPackages, parseCommentedJson, syncProjectReferences, type TsConfig } from '../sync.js';
+import { findPackages, parseCommentedJson, syncProjectReferences, type TsConfig } from '../sync';
 
 function writeJson(filePath: string, value: unknown): void {
   writeFileSync(filePath, JSON.stringify(value, null, 2), 'utf8');
@@ -52,8 +52,6 @@ describe('findPackages', () => {
     const pluginDir = join(repoRoot, 'plugins/kernel/node');
     mkdirSync(join(pluginDir, 'src'), { recursive: true });
     writeJson(join(pluginDir, 'package.json'), { name: '@test/plugin-node' });
-    // A package.json nested under "src" should never be reached because
-    // recursion stops as soon as a package.json is found in an ancestor dir.
     writeJson(join(pluginDir, 'src/package.json'), { name: '@test/should-not-be-found' });
 
     const result = findPackages(join(repoRoot, 'plugins'), repoRoot);
@@ -135,10 +133,9 @@ describe('syncProjectReferences', () => {
     ]);
     expect(readTsConfig('plugins/kernel/backend/tsconfig.json').references).toEqual([{ path: '../node' }]);
 
-    // No internal deps: the node package's tsconfig is left untouched (no "references" key added).
     const nodeTsConfig = readTsConfig('plugins/kernel/node/tsconfig.json');
     expect(nodeTsConfig.references).toBeUndefined();
-    expect((nodeTsConfig.compilerOptions as { outDir?: string })?.outDir).toBe(
+    expect((nodeTsConfig['compilerOptions'] as { outDir?: string })?.outDir).toBe(
       '../../../dist-types/plugins/kernel/node',
     );
 
@@ -177,5 +174,91 @@ describe('syncProjectReferences', () => {
     syncProjectReferences();
 
     expect(readTsConfig('packages/app/tsconfig.json').references).toBeUndefined();
+  });
+
+  it('should catch malformed json configurations gracefully without breaking execution logs', () => {
+    mkdirSync(join(repoRoot, 'packages/app'), { recursive: true });
+    writeJson(join(repoRoot, 'packages/app/package.json'), {
+      name: '@test/app',
+      dependencies: { '@test/plugin-node': '^0.0.1' },
+    });
+
+    writeFileSync(join(repoRoot, 'packages/app/tsconfig.json'), '{ "broken": [,,] }', 'utf8');
+
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { /* no-op */ });
+
+    expect(() => syncProjectReferences()).not.toThrow();
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Error writing tsconfig for packages/app'),
+      expect.any(String)
+    );
+  });
+
+  it('should bypass leaf directories safely if a valid tsconfig.json file is absent', () => {
+    mkdirSync(join(repoRoot, 'packages/pure-javascript-addon'), { recursive: true });
+    writeJson(join(repoRoot, 'packages/pure-javascript-addon/package.json'), {
+      name: '@test/js-addon',
+    });
+
+    expect(() => syncProjectReferences()).not.toThrow();
+  });
+
+  it('should enforce strict alphabetical ordering on output references to guarantee deterministic builds', () => {
+    mkdirSync(join(repoRoot, 'packages/app'), { recursive: true });
+    writeJson(join(repoRoot, 'packages/app/package.json'), {
+      name: '@test/app',
+      // Declare dependencies in reverse or unsorted entry order
+      dependencies: { 
+        '@test/z-plugin': '^1.0.0',
+        '@test/a-plugin': '^1.0.0',
+        '@test/m-plugin': '^1.0.0'
+      },
+    });
+    writeJson(join(repoRoot, 'packages/app/tsconfig.json'), {});
+
+    mkdirSync(join(repoRoot, 'plugins/z-plugin'), { recursive: true });
+    writeJson(join(repoRoot, 'plugins/z-plugin/package.json'), { name: '@test/z-plugin' });
+    mkdirSync(join(repoRoot, 'plugins/a-plugin'), { recursive: true });
+    writeJson(join(repoRoot, 'plugins/a-plugin/package.json'), { name: '@test/a-plugin' });
+    mkdirSync(join(repoRoot, 'plugins/m-plugin'), { recursive: true });
+    writeJson(join(repoRoot, 'plugins/m-plugin/package.json'), { name: '@test/m-plugin' });
+
+    writeJson(join(repoRoot, 'tsconfig.json'), {});
+
+    syncProjectReferences();
+
+    // Assert the output is fully sorted alphabetically regardless of package.json order
+    expect(readTsConfig('packages/app/tsconfig.json').references).toEqual([
+      { path: '../../plugins/a-plugin' },
+      { path: '../../plugins/m-plugin' },
+      { path: '../../plugins/z-plugin' },
+    ]);
+  });
+
+  it('should preserve surrounding config parameters when healing a tsconfig path matrix', () => {
+    mkdirSync(join(repoRoot, 'packages/app'), { recursive: true });
+    writeJson(join(repoRoot, 'packages/app/package.json'), {
+      name: '@test/app',
+      dependencies: { '@test/plugin-node': '^0.0.1' },
+    });
+
+    writeJson(join(repoRoot, 'packages/app/tsconfig.json'), {
+      compilerOptions: { strict: true, target: 'es2022' },
+      include: ['src/*.ts']
+    });
+
+    mkdirSync(join(repoRoot, 'plugins/kernel/node'), { recursive: true });
+    writeJson(join(repoRoot, 'plugins/kernel/node/package.json'), { name: '@test/plugin-node' });
+
+    writeJson(join(repoRoot, 'tsconfig.json'), {});
+
+    syncProjectReferences();
+
+    const output = readTsConfig('packages/app/tsconfig.json');
+
+    // Core check: References are injected, but surrounding custom setup arrays remain unaltered
+    expect(output.references).toEqual([{ path: '../../plugins/kernel/node' }]);
+    expect(output['include']).toEqual(['src/*.ts']);
+    expect(output['compilerOptions']).toEqual({ strict: true, target: 'es2022' });
   });
 });

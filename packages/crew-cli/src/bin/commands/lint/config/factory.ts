@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// 📂 packages/cli/src/bin/commands/lint/lib/factory.ts
 import { builtinModules } from 'node:module';
 // @ts-expect-error - Internal third-party package lacking native type declarations
 import backstagePluginRaw from '@backstage/eslint-plugin';
@@ -38,10 +37,19 @@ interface FlatConfigPlugin {
   };
 }
 
+interface StorybookConfigPlugin {
+  configs?: {
+    recommended?: {
+      rules?: Record<string, unknown>;
+    };
+  };
+}
+
 const backstagePlugin = backstagePluginRaw as Record<string, unknown>;
 const eslintConfigPrettier = eslintConfigPrettierRaw as Record<string, unknown>;
 const unusedImportsPlugin = unusedImportsPluginRaw as Record<string, unknown>;
 const jsxA11yPlugin = jsxA11yPluginRaw as FlatConfigPlugin;
+const storybookPlugin = storybookPluginRaw as StorybookConfigPlugin;
 
 const getBaseConfigBlock = () => ({
   files: ['**/*.ts', '**/*.tsx'],
@@ -168,19 +176,18 @@ export function createFlatConfigForWorkspace(extraOverrides: Record<string, unkn
     });
   }
 
-  // 💡 FIXED: Access using defensive indexing properties to prevent test execution crashes if the plugin is unpopulated or mocked
-  const storybookPlugin = storybookPluginRaw as any;
-  const storybookRules = storybookPlugin?.['configs']?.['recommended']?.['rules'] || {};
+  // Safe type-guarded resolution without any "any" leaking rules
+  const storybookRules = storybookPlugin?.configs?.recommended?.rules || {};
 
   configs.push({
     files: ['**/*.stories.@(ts|tsx|js|jsx)'],
-    plugins: { storybook: storybookPlugin },
+    plugins: { storybook: storybookPlugin as unknown as Record<string, unknown> },
     rules: { ...storybookRules },
   });
 
   configs.push({
     files: ['**/*.test.*', '**/*.spec.*', '**/__mocks__/**', '**/__testUtils__/**', 'src/setupTests.*'],
-    plugins: { jest: jestPlugin },
+    plugins: { jest: jestPlugin as unknown as Record<string, unknown> },
     languageOptions: { globals: { ...globals.jest } },
     rules: {
       'jest/no-disabled-tests': 'warn',

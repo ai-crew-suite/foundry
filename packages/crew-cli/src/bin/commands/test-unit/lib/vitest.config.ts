@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { defineConfig } from 'vitest/config';
-import { getWorkspaceContext } from '../../../utils/workspace.js'; 
+import { getWorkspaceContext } from '../../../utils/workspace';
 import path from 'node:path';
 
 const context = getWorkspaceContext();

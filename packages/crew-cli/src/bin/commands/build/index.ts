@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import { Command } from 'commander';
-import { getWorkspaceContext } from '../../utils/workspace.js';
+import { getWorkspaceContext } from '../../utils/workspace';
 import { runBuildPipeline } from './lib/orchestrate';
 
 const program = new Command();

@@ -15,7 +15,7 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
-import { getWorkspaceContext } from '../../../utils/workspace.js';
+import { getWorkspaceContext } from '../../../utils/workspace';
 
 export interface PackageJson {
   name?: string;
@@ -38,7 +38,7 @@ export interface TsConfigReference {
 
 export interface TsConfig {
   references?: TsConfigReference[];
-  [key: string]: unknown; // 💡 FIXED: Enforced type safety
+  [key: string]: unknown;
 }
 
 /**
@@ -50,7 +50,7 @@ export function parseCommentedJson<T = Record<string, unknown>>(jsonString: stri
     .replace(/^(?:[^"\n]|"[^"\n]*")*?(\/\/.*)$/gm, (match, group1) => {
       return match.replace(group1, '');
     })
-    .replace(/,\s*([}\]])/g, '$1'); // Accept JSONC trailing commas
+    .replace(/,\s*([}\]])/g, '$1');
   return JSON.parse(cleanJson) as T;
 }
 
@@ -96,14 +96,11 @@ export function findPackages(
  * Iterates through all internal packages to align child-level references and root map targets
  */
 export function syncProjectReferences(): void {
-  // 💡 FIXED: Read the absolute repo root path dynamically using your shared workspace context
   const context = getWorkspaceContext();
   const repoRoot = context.repoRoot;
 
   const allPackages = new Map<string, PackageInfo>();
 
-  // Consumer repos are organized as "packages" (Backstage app/backend) and
-  // "plugins" (Backstage plugins) — there is no top-level "apps" directory.
   findPackages(path.join(repoRoot, 'packages'), repoRoot, allPackages);
   findPackages(path.join(repoRoot, 'plugins'), repoRoot, allPackages);
 
@@ -113,8 +110,6 @@ export function syncProjectReferences(): void {
     const tsconfigPath = path.join(pkgInfo.dirPath, 'tsconfig.json');
     if (!fs.existsSync(tsconfigPath)) return;
 
-    // TypeScript project references should follow package edges, not tooling
-    // dependencies such as the repository CLI used by package scripts.
     const deps = {
       ...pkgInfo.pkgJson.dependencies,
       ...pkgInfo.pkgJson.peerDependencies,
@@ -123,8 +118,10 @@ export function syncProjectReferences(): void {
     const tsconfigReferences: TsConfigReference[] = [];
 
     Object.keys(deps).forEach((depName) => {
-      if (allPackages.has(depName)) {
-        const targetPkg = allPackages.get(depName)!;
+      // Fix: Get the package directly and let type narrowing verify it exists instead of using '!'
+      const targetPkg = allPackages.get(depName);
+
+      if (targetPkg) {
         let relativePath = path.relative(pkgInfo.dirPath, targetPkg.dirPath).replace(/\\/g, '/');
 
         if (!relativePath.startsWith('.')) {

@@ -15,7 +15,7 @@
  */
 import { Command } from 'commander';
 import chalk from 'chalk';
-import { syncProjectReferences } from './lib/sync.js';
+import { syncProjectReferences } from './lib/sync';
 
 const program = new Command();
 
@@ -23,12 +23,17 @@ program
   .name('sync:refs')
   .description('Synchronize all TypeScript package project references and heal the root configuration')
   .action(() => {
-    console.log(`\n${chalk.blue('🔄 AI CREW SUITE: Healing monorepo TypeScript project references...')}`);
+    try {
+      console.log(`\n${chalk.blue('🔄 AI CREW SUITE: Healing monorepo TypeScript project references...')}`);
 
-    syncProjectReferences();
+      syncProjectReferences();
 
-    console.log(`${chalk.green('✅ Project reference mappings aligned perfectly!')}\n`);
-    process.exit(0);
+      console.log(`${chalk.green('✅ Project reference mappings aligned perfectly!')}\n`);
+      process.exitCode = 0;
+    } catch (error) {
+      console.error(chalk.red('❌ Core reference sync orchestration framework error:'), error);
+      process.exitCode = 1;
+    }
   });
 
 program.parse(process.argv);

@@ -17,14 +17,14 @@ import { vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 
 declare global {
   var jest: {
-    fn: (...args: any[]) => ReturnType<typeof vi.fn>;
-    spyOn: (...args: any[]) => any;
+    fn: (implementation?: (...args: any[]) => any) => ReturnType<typeof vi.fn>;
+    spyOn: (target: object, method: string) => ReturnType<typeof vi.spyOn>;
   };
 }
 
 globalThis.jest = {
-  fn: (...args: any[]) => vi.fn(...args),
-  spyOn: (...args: any[]) => vi.spyOn(...(args as [any, any])),
+  fn: (implementation?: (...args: any[]) => any) => vi.fn(implementation),
+  spyOn: (target: object, method: string) => vi.spyOn(target, method as never),
 };
 
 const isBrowserEnv = typeof window !== 'undefined';
@@ -36,7 +36,7 @@ if (isBrowserEnv) {
   });
 
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockImplementation(() => {
-    return {} as any;
+    return {} as unknown as RenderingContext;
   });
 
   Object.defineProperty(window, 'matchMedia', {
@@ -45,19 +45,34 @@ if (isBrowserEnv) {
       matches: false,
       media: query,
       onchange: null,
-      addListener() {},
-      removeListener() {},
-      addEventListener() {},
-      removeEventListener() {},
+      addListener() {
+        /* no-op */
+      },
+      removeListener() {
+        /* no-op */
+      },
+      addEventListener() {
+        /* no-op */
+      },
+      removeEventListener() {
+        /* no-op */
+      },
       dispatchEvent: () => false,
     }),
   });
 
-  class MockIntersectionObserver {
+  class MockIntersectionObserver implements IntersectionObserver {
+    readonly root: Element | Document | null = null;
+    readonly rootMargin: string = '';
+    // Fixed: Added the missing scrollMargin layout property to satisfy modern lib.dom.d.ts specifications
+    readonly scrollMargin: string = '';
+    readonly thresholds: readonly number[] = [];
     observe = vi.fn();
     disconnect = vi.fn();
     unobserve = vi.fn();
+    takeRecords = vi.fn(() => []);
   }
+
   Object.defineProperty(window, 'IntersectionObserver', {
     writable: true,
     configurable: true,

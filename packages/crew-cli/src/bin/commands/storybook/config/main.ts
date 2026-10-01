@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// 📂 packages/cli/src/bin/commands/storybook/config/main.ts
 import { fileURLToPath } from "node:url";
 import { dirname } from "node:path";
 import path from 'node:path';

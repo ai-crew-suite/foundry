@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 import { Command } from 'commander';
-import { getWorkspaceContext } from '../../utils/workspace.js';
-import { cleanWorkspace } from './lib/clean.js';
+import { getWorkspaceContext } from '../../utils/workspace';
+import { cleanWorkspace } from './lib/clean';
 
 const program = new Command();
 

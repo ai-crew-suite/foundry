@@ -16,7 +16,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { findRepoRoot } from '../../../utils/workspace.js';
+import { findRepoRoot } from '../../../utils/workspace';
 
 const __filename = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(__filename);
@@ -59,9 +59,9 @@ export default defineConfig({
   use: {
     baseURL: APP_URL,
     viewport: { width: 1440, height: 900 },
-    actionTimeout: 30000, 
+    actionTimeout: 30000,
     navigationTimeout: 30000,
-    trace: 'retain-on-failure', 
+    trace: 'retain-on-failure',
     headless: true,
     screenshot: 'only-on-failure',
     // Cache the authentication states securely inside a localized temporary directory inside the CLI package
@@ -71,7 +71,7 @@ export default defineConfig({
   projects: [
     {
       name: 'setup',
-      testMatch: /playwright\/.*\.setup\.ts/ 
+      testMatch: /playwright\/.*\.setup\.ts/
     },
     {
       name: 'chromium',

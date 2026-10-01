@@ -22,9 +22,16 @@ import { TestApiProvider, wrapInTestApp } from '@backstage/test-utils';
 import { alertApiRef, errorApiRef, ErrorApi } from '@backstage/core-plugin-api';
 
 const mockErrorApi: Partial<ErrorApi> = {
-  post: () => {},
+  post: () => {
+    /* no-op */
+  },
   error$: () => ({
-    subscribe: () => ({ closed: false, unsubscribe: () => {} }),
+    subscribe: () => ({
+      closed: false, 
+      unsubscribe: () => {
+        /* no-op */
+      }
+    }),
     [Symbol.observable]() { return this; },
   }),
 };
@@ -32,18 +39,22 @@ const mockErrorApi: Partial<ErrorApi> = {
 const backstageDecorator: DecoratorFunction<ReactRenderer> = (Story, context) => {
   const selectedThemeKey = context['globals']['theme'] || 'light';
   const activeTheme = selectedThemeKey === 'dark' ? themes.dark : themes.light;
-  const mockAlertApi = { post: () => {} };
+  // Fix 3
+  const mockAlertApi = {
+    post: () => {
+      /* no-op */
+    }
+  };
   const storyMockApis = context['loaded']?.['mockApis'] || [];
 
   return (
     <TestApiProvider apis={[
-      [alertApiRef, mockAlertApi], 
+      [alertApiRef, mockAlertApi],
       [errorApiRef, mockErrorApi],
       ...storyMockApis
     ]}>
       <UnifiedThemeProvider theme={activeTheme}>
         <CssBaseline />
-        {/* 💡 FIXED: Access using bracket notation */}
         {wrapInTestApp(<Story />, context['parameters']['backstage'])}
       </UnifiedThemeProvider>
     </TestApiProvider>

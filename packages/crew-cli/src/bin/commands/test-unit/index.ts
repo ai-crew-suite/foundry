@@ -14,43 +14,25 @@
  * limitations under the License.
  */
 import { Command } from 'commander';
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import chalk from 'chalk';
-import { getWorkspaceContext } from '../../utils/workspace.js';
+import { getWorkspaceContext } from '../../utils/workspace';
+import { runUnitTestsPipeline } from './lib/orchestrate';
 
 const program = new Command();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
   .name('test:unit')
   .description('Execute package unit tests matrix via Vitest')
-  .allowUnknownOption(true) 
+  .allowUnknownOption(true)
   .action(() => {
-    const context = getWorkspaceContext();
+    try {
+      const context = getWorkspaceContext();
+      const forwardedArgs = process.argv.slice(3);
 
-    console.log(`${chalk.blue('🧪 Executing Unit Tests for:')} ${chalk.bold(context.packageName)} ${chalk.gray(`(${context.role})`)}`);
-
-    const internalConfigPath = path.resolve(__dirname, 'lib/vitest.config.js');
-    const forwardedArgs = process.argv.slice(3);
-
-    const testResult = spawnSync(
-      'yarn',
-      ['vitest', 'run', '-c', internalConfigPath, ...forwardedArgs],
-      {
-        stdio: 'inherit',
-        shell: true,
-        cwd: context.packageDir,
-      }
-    );
-
-    if (testResult.error) {
-      console.error(chalk.red('❌ Process Execution Error: Failed to invoke Vitest engine.'), testResult.error);
-      process.exit(1);
+      runUnitTestsPipeline(context, forwardedArgs);
+    } catch (error) {
+      console.error(`\x1b[31m❌ Core test-unit orchestration framework error:\x1b[0m`, error);
+      process.exitCode = 1;
     }
-
-    process.exit(testResult.status ?? 0);
   });
 
 program.parse(process.argv);

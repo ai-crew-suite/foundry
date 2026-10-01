@@ -14,37 +14,25 @@
  * limitations under the License.
  */
 import { Command } from 'commander';
-import { spawnSync } from 'node:child_process';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-import chalk from 'chalk';
-import { getWorkspaceContext } from '../../utils/workspace.js';
+import { getWorkspaceContext } from '../../utils/workspace';
+import { runStorybookPipeline } from './lib/orchestrate';
 
 const program = new Command();
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 program
   .name('storybook')
   .description('Boot up the consolidated interactive Storybook documentation server')
   .allowUnknownOption(true)
   .action(() => {
-    const context = getWorkspaceContext();
-    console.log(`${chalk.green('📖 AI CREW SUITE: Spinning up self-contained Storybook platform...')}`);
+    try {
+      const context = getWorkspaceContext();
+      const forwardedArgs = process.argv.slice(3);
 
-    const internalConfigDir = path.resolve(__dirname, 'config');
-    const forwardedArgs = process.argv.slice(3);
-
-    const result = spawnSync('yarn', ['storybook', 'dev', '-p', '6006', '--config-dir', internalConfigDir, ...forwardedArgs], {
-      stdio: 'inherit',
-      shell: true,
-      cwd: path.resolve(__dirname, '../../../../'), // packages/cli
-      env: {
-        ...process.env,
-        AI_CREW_SUITE_REPO_ROOT: context.repoRoot
-      }
-    });
-
-    process.exit(result.status ?? 0);
+      runStorybookPipeline(context, forwardedArgs);
+    } catch (error) {
+      console.error(`\x1b[31m❌ Core storybook orchestration framework error:\x1b[0m`, error);
+      process.exitCode = 1;
+    }
   });
 
 program.parse(process.argv);
