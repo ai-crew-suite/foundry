@@ -22,3 +22,6 @@
 import { createFlatConfigForWorkspace } from '@ai-crew-suite/cli/config/eslint';
 
 export default createFlatConfigForWorkspace();
+
+// @TODO: Add a rule that drivers can't import from the core backend plugin, only from core node
+// @TODO: The renovate.json for drivers, community-agents, and core should be moved to infra

@@ -23,7 +23,8 @@
     "types": ["node"]
   },
   "include": [
-    "${configDir}/src/**/*",
-    "${configDir}/@types/**/*"
+    "${configDir}/@types/**/*",
+    "${configDir}/rollup.config.ts",
+    "${configDir}/src/**/*"
   ]
 }
