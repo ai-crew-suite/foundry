@@ -1,4 +1,26 @@
 {
+  "eslint.nodePath": ".yarn/sdks",
+  "files.associations": {
+    "**/actions/**/action.yaml": "yaml",
+    "**/actions/**/action.yml": "yaml"
+  },
+  "github-actions.workflows.validation.secrets": false,
+  "github-actions.workflows.validation.variables": false,
+  "json.schemas": [
+    {
+      "fileMatch": [".yarnrc.yml"],
+      "url": "https://schemastore.org"
+    }
+  ],
+  "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
+  "search.exclude": {
+    "**/.yarn": true,
+    "**/.pnp.*": true
+  },
+  "yaml.schemas": {
+    "https://backstage.io": "app-config*.yaml",
+    "https://schemastore.org": ["master-catalogs.yml"]
+  },
   "cSpell.words": [
     "Accum",
     "actioned",
@@ -23,6 +45,7 @@
     "IDOR",
     "Ilshidur",
     "incidentio",
+    "jiti",
     "jsdom",
     "jsons",
     "knex",
@@ -53,6 +76,7 @@
     "rharkor",
     "rjsf",
     "roadiehq",
+    "rollup",
     "SCAF",
     "scoree",
     "smhd",
@@ -70,29 +94,16 @@
     "unredacted",
     "Unrouted",
     "unsourced",
+    "unstub",
     "untimed",
     "upserts",
     "Vercel",
+    "vite",
     "westus",
     "xlarge",
     "xoxb",
     "xoxp",
+    "yarnrc",
     "zipfs"
-  ],
-  "search.exclude": {
-    "**/.yarn": true,
-    "**/.pnp.*": true
-  },
-  "eslint.nodePath": ".yarn/sdks",
-  "prettier.prettierPath": ".yarn/sdks/prettier/index.cjs",
-  "js/ts.tsdk.path": ".yarn/sdks/typescript/lib",
-  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
-  "yaml.schemas": {
-    "https://backstage.io": "app-config*.yaml"
-  },
-  "typescript.tsdk": ".yarn/sdks/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "chat.instructionsFilesLocations": {
-    ".vscode/instructions": true
-  }
+  ]
 }
