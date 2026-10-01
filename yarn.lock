@@ -15,6 +15,13 @@ __metadata:
 "@ai-crew-suite/canonical-repo-assets@workspace:packages/canonical-repo-assets":
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/canonical-repo-assets@workspace:packages/canonical-repo-assets"
+  dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
+    "@rollup/plugin-typescript": "catalog:dev"
+    rollup: "catalog:dev"
+    rollup-plugin-dts: "catalog:dev"
+    tslib: "catalog:dev"
+    typescript: "catalog:dev"
   languageName: unknown
   linkType: soft
 
@@ -53,6 +60,7 @@ __metadata:
     eslint-plugin-react-hooks: "catalog:prod"
     eslint-plugin-storybook: "catalog:prod"
     eslint-plugin-unused-imports: "catalog:prod"
+    jiti: "catalog:dev"
     jsdom: "catalog:prod"
     msw: "catalog:prod"
     msw-storybook-addon: "catalog:prod"
@@ -122,6 +130,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/playwright-shared-config@workspace:packages/playwright-shared-config"
   dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
     "@rollup/plugin-typescript": "catalog:dev"
     rollup: "catalog:dev"
     rollup-plugin-dts: "catalog:dev"
@@ -136,6 +145,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/prettier-shared-config@workspace:packages/prettier-shared-config"
   dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
     "@rollup/plugin-typescript": "catalog:dev"
     rollup: "catalog:dev"
     rollup-plugin-dts: "catalog:dev"
@@ -149,12 +159,26 @@ __metadata:
 "@ai-crew-suite/renovate-shared-config@workspace:packages/renovate-shared-config":
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/renovate-shared-config@workspace:packages/renovate-shared-config"
+  dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
+    "@rollup/plugin-typescript": "catalog:dev"
+    rollup: "catalog:dev"
+    rollup-plugin-dts: "catalog:dev"
+    tslib: "catalog:dev"
+    typescript: "catalog:dev"
   languageName: unknown
   linkType: soft
 
 "@ai-crew-suite/typescript-shared-config@workspace:packages/typescript-shared-config":
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/typescript-shared-config@workspace:packages/typescript-shared-config"
+  dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
+    "@rollup/plugin-typescript": "catalog:dev"
+    rollup: "catalog:dev"
+    rollup-plugin-dts: "catalog:dev"
+    tslib: "catalog:dev"
+    typescript: "catalog:dev"
   peerDependencies:
     typescript: "*"
   languageName: unknown
@@ -164,21 +188,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/yarn-plugin-custom-add@workspace:packages/yarn-plugin-custom-add"
   dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
     "@rollup/plugin-typescript": "catalog:dev"
-    "@types/node": "catalog:dev"
     "@yarnpkg/core": "catalog:dev"
     rollup: "catalog:dev"
-  languageName: unknown
-  linkType: soft
-
-"@ai-crew-suite/yarn-plugin-custom-install@workspace:packages/yarn-plugin-custom-install":
-  version: 0.0.0-use.local
-  resolution: "@ai-crew-suite/yarn-plugin-custom-install@workspace:packages/yarn-plugin-custom-install"
-  dependencies:
-    "@rollup/plugin-typescript": "catalog:dev"
-    "@types/node": "catalog:dev"
-    "@yarnpkg/core": "catalog:dev"
-    rollup: "catalog:dev"
+    rollup-plugin-dts: "catalog:dev"
+    tslib: "catalog:dev"
+    typescript: "catalog:dev"
   languageName: unknown
   linkType: soft
 
@@ -13772,6 +13788,15 @@ __metadata:
   bin:
     jiti: lib/jiti-cli.mjs
   checksum: 10c0/4ceac133a08c8faff7eac84aabb917e85e8257f5ad659e843004ce76e981c457c390a220881748ac67ba1b940b9b729b30fb85cbaf6e7989f04b6002c94da331
+  languageName: node
+  linkType: hard
+
+"jiti@npm:^2.7.0":
+  version: 2.7.0
+  resolution: "jiti@npm:2.7.0"
+  bin:
+    jiti: lib/jiti-cli.mjs
+  checksum: 10c0/1b1e2310a490dce1aeea3da5f5dfe18273516c20ce48be2e98eb8ea452d5f3dcc8fd0cfd6d28b4052a24c5dbab6e3089b2d7e79f0bce7915b10d750929563c42
   languageName: node
   linkType: hard
 

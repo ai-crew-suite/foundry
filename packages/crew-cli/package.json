@@ -38,7 +38,7 @@
   "scripts": {
     "build": "yarn clean && rollup --config rollup.config.ts --configPlugin typescript",
     "clean": "rimraf dist",
-    "lint": "node ./dist/bin/crew.js lint",
+    "lint": "eslint .",
     "publish": "npm publish",
     "test": "yarn test:run",
     "test:unit": "vitest run --config ./vitest.config.ts",
@@ -93,6 +93,23 @@
     "@rollup/plugin-typescript": "catalog:dev",
     "@types/jest": "catalog:dev",
     "@types/node": "catalog:dev",
+    "jiti": "catalog:dev",
     "rollup": "catalog:dev"
+  },
+  "turbo": {
+    "tasks": {
+      "build": {
+        "dependsOn": [],
+        "outputs": [
+          "dist/**"
+        ]
+      },
+      "lint": {
+        "dependsOn": []
+      },
+      "typecheck": {
+        "dependsOn": []
+      }
+    }
   }
 }

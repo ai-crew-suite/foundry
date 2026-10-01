@@ -1,5 +1,5 @@
 {
-  "$schema": "https://turbo.build",
+  "$schema": "./node_modules/turbo/schema.json",
   "concurrency": "75%",
   "globalEnv": [
     "NODE_ENV",
@@ -21,6 +21,17 @@
         "PLAYWRIGHT_BACKEND_PORT"
       ]
     },
+    "clean": {
+      "cache": false
+    },
+    "lint": {
+      "dependsOn": [],
+      "outputs": []
+    },
+    "publish-packages": {
+      "dependsOn": ["lint", "typecheck", "test:unit", "build"],
+      "cache": false
+    },
     "start": {
       "cache": false,
       "persistent": true,
@@ -31,57 +42,13 @@
       "persistent": true,
       "dependsOn": ["^build"]
     },
-    "clean": {
-      "cache": false
-    },
-    "lint": {
-      "dependsOn": ["^build"],
-      "outputs": []
-    },
-    "storybook": {
-      "cache": false,
-      "persistent": true
-    },
-    "storybook:build": {
-      "dependsOn": ["^build"],
-      "outputs": ["packages/cli/storybook-static/**"],
-      "cache": true
-    },
     "sync": {
       "inputs": [
-        "apps/**/package.json",
-        "packages/**/package.json",
-        "plugins/**/package.json"
+        "packages/**/package.json"
       ],
       "outputs": [
-        "apps/**/tsconfig.json",
         "packages/**/tsconfig.json",
-        "plugins/**/tsconfig.json",
         "tsconfig.json"
-      ]
-    },
-    "test:e2e": {
-      "cache": true,
-      "dependsOn": ["^build"],
-      "inputs": [
-        "apps/**/*.ts",
-        "apps/**/*.tsx",
-        "plugins/**/*.ts",
-        "plugins/**/*.tsx",
-        "**/src/**/*.e2e.test.ts"
-      ],
-      "outputs": [
-        "playwright-report/**",
-        "test-results/**"
-      ],
-      "env": [
-        "PLAYWRIGHT_APP_HOST",
-        "PLAYWRIGHT_APP_PORT",
-        "PLAYWRIGHT_BACKEND_HOST",
-        "PLAYWRIGHT_BACKEND_PORT",
-        "PLAYWRIGHT_BASE_URL",
-        "PLAYWRIGHT_BACKEND_HEALTH_URL",
-        "CI"
       ]
     },
     "test:unit": {
@@ -93,14 +60,13 @@
       "dependsOn": ["^build"],
       "inputs": [
         "src/**/*",
-        "src/**/*.test.ts",
-        "src/**/*.test.tsx"
+        "src/**/*.test.ts"
       ],
       "outputs": ["coverage/**"],
       "cache": true
     },
     "typecheck": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": []
     }
   }

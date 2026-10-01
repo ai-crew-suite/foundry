@@ -15,9 +15,9 @@ Every package in the monorepo utilizes the uniform crew binary interface. To con
     "build": "crew build",
     "clean": "crew clean",
     "lint": "crew lint",
-    "typecheck": "crew typecheck",
+    "test:unit:coverage": "crew test:unit:coverage",
     "test:unit": "crew test:unit",
-    "test:unit:coverage": "crew test:unit:coverage"
+    "typecheck": "crew typecheck"
   },
   "devDependencies": {
     "@ai-crew-suite/cli": "workspace:*"
@@ -68,19 +68,19 @@ bash
 ### Execute unit and integration tests against local raw TypeScript source files
 
 ```bash
-yarn turbo run test:unit --filter=@ai-crew-suite/cli
+yarn turbo run test:unit --filter=@ai-crew-suite/crew-cli
 ```
 
 ### Run local code-coverage metric scans against the CLI package
 
 ```bash
-yarn turbo run test:unit:coverage --filter=@ai-crew-suite/cli
+yarn turbo run test:unit:coverage --filter=@ai-crew-suite/crew-cli
 ```
 
 ### Compile changes fresh using Rollup
 
 ```bash
-yarn turbo run build --filter=@ai-crew-suite/cli
+yarn turbo run build --filter=@ai-crew-suite/crew-cli
 ```
 
 ## 🧩 Shared Config Subpath Exports
@@ -89,7 +89,7 @@ This toolkit exposes zero-boilerplate configuration hooks directly to the monore
 
 ```typescript
 // eslint.config.js (At Monorepo Root)
-import { createFlatConfigForWorkspace } from '@ai-crew-suite/cli/config/eslint';
+import { createFlatConfigForWorkspace } from '@ai-crew-suite/crew-cli/config/eslint';
 
 export default createFlatConfigForWorkspace();
 ```

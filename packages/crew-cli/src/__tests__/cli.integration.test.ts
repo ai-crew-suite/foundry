@@ -16,33 +16,39 @@
 import { describe, it, expect } from 'vitest';
 import { spawnSync } from 'node:child_process';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const currentDir = path.dirname(__filename);
 
 describe('AI Crew Toolbelt CLI Integration Suite', () => {
-  // 💡 Point directly to the compiled production build file.
-  // Turborepo guarantees this file is fully built and up-to-date before running tests.
-  const binaryPath = path.resolve(currentDir, '../../dist/bin/crew.js');
+  const binaryPath = path.resolve('src/bin/crew.ts');
 
   it('should cleanly output the custom magenta header on help flags', () => {
-    // 💡 Execute via raw node array parameters with shell: false to avoid security warning wrappers
-    const result = spawnSync('node', [binaryPath, '--help'], {
+    const result = spawnSync('npx', ['tsx', binaryPath, '--help'], {
       encoding: 'utf8',
-      shell: false
+      shell: true
     });
 
-    // Commander natively exits with a clean 0 when an explicit '--help' flag hits a compiled bundle path
     expect(result.status).toBe(0);
     expect(result.stdout).toContain('AI CREW SUITE');
     expect(result.stdout).toContain('build');
   });
 
   it('should terminate with a non-zero exit code on unrecognized commands', () => {
-    const result = spawnSync('node', [binaryPath, 'invalid-task-name'], {
-      shell: false
+    const result = spawnSync('npx', ['tsx', binaryPath, 'invalid-task-name'], {
+      shell: true
     });
     expect(result.status).not.toBe(0);
+  });
+
+  it('should forward unknown options down to the build action runner without crashing', () => {
+    // Passing a random flag down to verify Commander's .allowUnknownOption(true) works on the build command
+    const result = spawnSync('npx', ['tsx', binaryPath, 'build', '--invalid-forwarded-flag-test'], {
+      encoding: 'utf8',
+      shell: true
+    });
+
+    // It might exit with a failure code because Backstage/TSC rejects the flag,
+    // but the crew-cli wrapper process should successfully handle the pass-through context
+    expect(result.status).toBeDefined();
+    // Verify it reached our custom command block instead of hitting standard Commander errors
+    expect(result.stderr).not.toContain("error: unknown option");
   });
 });

@@ -53,6 +53,7 @@
     "prettier": "*"
   },
   "devDependencies": {
+    "@ai-crew-suite/crew-cli": "workspace:*",
     "@rollup/plugin-typescript": "catalog:dev",
     "rollup": "catalog:dev",
     "rollup-plugin-dts": "catalog:dev",

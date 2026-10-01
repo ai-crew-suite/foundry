@@ -15,7 +15,7 @@
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import fs from 'node:fs';
-import { findRepoRoot, getWorkspaceContext } from '../workspace.js';
+import { findRepoRoot, getWorkspaceContext } from '../workspace';
 
 describe('Workspace Context Utilities Engine', () => {
   const mockCwd = '/home/user/repo/packages/my-package';

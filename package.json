@@ -21,7 +21,7 @@
     "sync": "crew sync:refs",
     "test": "yarn test:unit && yarn test:e2e && yarn test:unit:coverage",
     "test:unit": "turbo run test:unit",
-    "test:unit:coverage": "turbo run test:unit -- --coverage",
+    "test:unit:coverage": "turbo run test:unit:coverage",
     "typecheck": "turbo typecheck",
     "typecheck:full": "turbo typecheck --force"
   },
