@@ -1,0 +1,23 @@
+name: Framework Alignment Validation
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * 1" # Runs every Monday
+
+permissions:
+  contents: read
+
+jobs:
+  audit-alignment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📂 Checkout Repository Codebase
+        uses: actions/checkout@v4
+
+      - name: 🔍 Sync Static Infrastructure Files
+        uses: ai-crew-suite/actions/sync-static-files@v1
+        with:
+          static_files_path: "static-repo-files-sync"
+          GH_PAT: ${{ secrets.GLOBAL_INFRA_PAT }}
+          PR_LABELS: "infrastructure, automated-sync"

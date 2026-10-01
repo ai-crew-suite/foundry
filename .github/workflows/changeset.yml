@@ -14,7 +14,6 @@ jobs:
     name: Execute Release Automation
     runs-on: ubuntu-latest
     steps:
-      # Pattern: uses: {org}/{repo}/{folder}@{ref}
       - name: 🛠️ Trigger Centralized Changeset Engine
         uses: ai-crew-suite/actions/changeset@v1
         with:
