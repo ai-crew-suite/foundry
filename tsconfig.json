@@ -7,9 +7,6 @@
   "references": [
     { "path": "./packages/canonical-repo-assets" },
     { "path": "./packages/crew-cli" },
-    { "path": "./packages/eslint-shared-config" },
-    { "path": "./packages/playwright-shared-config" },
-    { "path": "./packages/prettier-shared-config" },
     { "path": "./packages/renovate-shared-config" },
     { "path": "./packages/typescript-shared-config" },
     { "path": "./packages/yarn-plugin-custom-add" }

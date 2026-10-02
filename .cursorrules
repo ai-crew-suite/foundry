@@ -1,6 +1,6 @@
 # Cross-Tool Agent Rules
 
-You MUST read and apply our strict repository rules located in the paths below:
+Analyze the code by pulling the shared rules from the local files below into your memory layout:
 
 - .ai-rules/prompts/general-instructions.md
 - .ai-rules/prompts/frontend-app.instructions.md

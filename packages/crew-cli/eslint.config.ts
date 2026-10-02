@@ -26,7 +26,7 @@ export default tseslint.config(
     languageOptions: {
       parserOptions: {
         projectService: {
-          allowDefaultProject: ["eslint.config.ts"]
+          allowDefaultProject: ["eslint.config.ts", "vitest.config.ts"]
         },
         tsconfigRootDir: import.meta.dirname,
       },
@@ -64,6 +64,6 @@ export default tseslint.config(
     }
   },
   {
-    ignores: ["dist/**", "coverage/**"]
+    ignores: ["dist/**", "coverage/**", ".rollup.cache/**"]
   }
 );

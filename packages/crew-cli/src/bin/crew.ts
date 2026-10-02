@@ -68,6 +68,11 @@ program
     createCommandOpts('clean'),
   )
   .command(
+    'format',
+    'Run automated text style formatting across the workspace layout via Prettier',
+    createCommandOpts('format'),
+  )
+  .command(
     'lint',
     'Run structural ESLint validations',
     createCommandOpts('lint'),

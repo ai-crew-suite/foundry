@@ -71,6 +71,10 @@
           "dest": ".dockerignore"
         },
         {
+          "source": "templates/dotfiles/.editorconfig",
+          "dest": ".editorconfig"
+        },
+        {
           "source": "templates/dotfiles/.gitattributes",
           "dest": ".gitattributes"
         },
@@ -91,8 +95,8 @@
           "dest": ".npmrc"
         },
         {
-          "source": "templates/dotfiles",
-          "dest": ""
+          "source": "templates/dotfiles/eslint.config.ts",
+          "dest": "eslint.config.ts"
         }
       ]
     },
@@ -127,6 +131,134 @@
         {
           "source": "templates/husky/pre-commit",
           "dest": ".husky/pre-commit"
+        }
+      ]
+    },
+    {
+      "name": "CSpell Shared Dictionaries",
+      "repos": [
+        "ai-crew-suite/academy",
+        "ai-crew-suite/agents",
+        "ai-crew-suite/drivers",
+        "ai-crew-suite/foundry",
+        "ai-crew-suite/pipelines",
+        "ai-crew-suite/platform",
+        "ai-crew-suite/workbench"
+      ],
+      "files": [
+        {
+          "source": "templates/cspell/shared.txt",
+          "dest": ".cspell/shared.txt"
+        }
+      ]
+    },
+    {
+      "name": "Jetbrains IDE Configurations",
+      "repos": [
+        "ai-crew-suite/academy",
+        "ai-crew-suite/agents",
+        "ai-crew-suite/drivers",
+        "ai-crew-suite/foundry",
+        "ai-crew-suite/pipelines",
+        "ai-crew-suite/platform",
+        "ai-crew-suite/workbench"
+      ],
+      "files": [
+        {
+          "source": "templates/idea/externalDependencies.xml",
+          "dest": ".idea/externalDependencies.xml"
+        },
+        {
+          "source": "templates/idea/foundry.iml",
+          "dest": ".idea/foundry.iml"
+        },
+        {
+          "source": "templates/idea/jsonSchemas.xml",
+          "dest": ".idea/jsonSchemas.xml"
+        },
+        {
+          "source": "templates/idea/modules.xml",
+          "dest": ".idea/modules.xml"
+        },
+        {
+          "source": "templates/idea/workspace.xml",
+          "dest": ".idea/workspace.xml"
+        },
+        {
+          "source": "templates/idea/org_words.xml",
+          "dest": ".idea/dictionaries/org_words.xml"
+        }
+      ]
+    },
+    {
+      "name": "VSCode IDE Configurations",
+      "repos": [
+        "ai-crew-suite/academy",
+        "ai-crew-suite/agents",
+        "ai-crew-suite/drivers",
+        "ai-crew-suite/foundry",
+        "ai-crew-suite/pipelines",
+        "ai-crew-suite/platform",
+        "ai-crew-suite/workbench"
+      ],
+      "files": [
+        {
+          "source": "templates/vscode/settings.json",
+          "dest": ".vscode/settings.json"
+        },
+        {
+          "source": "templates/vscode/extensions.json",
+          "dest": ".vscode/extensions.json"
+        }
+      ]
+    },
+      {
+      "name": "AI Prompts",
+      "repos": [
+        "ai-crew-suite/academy",
+        "ai-crew-suite/agents",
+        "ai-crew-suite/drivers",
+        "ai-crew-suite/foundry",
+        "ai-crew-suite/pipelines",
+        "ai-crew-suite/platform",
+        "ai-crew-suite/workbench"
+      ],
+      "files": [
+        {
+          "source": "agents/AGENTS.md",
+          "dest": "AGENTS.md"
+        },
+        {
+          "source": "agents/.clinerules",
+          "dest": ".clinerules"
+        },
+        {
+          "source": "agents/.cursorrules",
+          "dest": ".cursorrules"
+        },
+        {
+          "source": "agents/.ai-rules/prompts/frontend-app.instructions.md",
+          "dest": ".ai-rules/prompts/frontend-app.instructions.md"
+        },
+        {
+          "source": "agents/.ai-rules/prompts/general-instructions.md",
+          "dest": ".ai-rules/prompts/general-instructions.md"
+        },
+        {
+          "source": "agents/.ai-rules/prompts/jsdoc-guidelines.md",
+          "dest": ".ai-rules/prompts/jsdoc-guidelines.md"
+        },
+        {
+          "source": "agents/.ai-rules/prompts/plugin-registration.md",
+          "dest": ".ai-rules/prompts/plugin-registration.md"
+        },
+        {
+          "source": "agents/.ai-rules/prompts/storybook.instructions.md",
+          "dest": ".ai-rules/prompts/storybook.instructions.md"
+        },
+        {
+          "source": "agents/.github/copilot-instructions.md",
+          "dest": ".github/copilot-instructions.md"
         }
       ]
     }

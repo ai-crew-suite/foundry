@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ExternalDependencies">
+    <!-- Eslint & prettier extensions -->
+    <plugin id="JavaScript" />
+    <plugin id="com.wmn4me.prettier" />
+
+    <!-- Redhat.vscode-yaml & json validation -->
+    <plugin id="org.jetbrains.plugins.yaml" />
+
+    <!-- Database tools (SQLTools & Drivers) -->
+    <plugin id="com.intellij.database" />
+
+    <!-- Recommended for handling multiple workspaces in a Monorepo -->
+    <plugin id="com.intellij.modules.monorepo" />
+  </component>
+</project>

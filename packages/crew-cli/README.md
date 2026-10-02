@@ -1,6 +1,6 @@
 # 🧰 AI Crew Suite CLI & Developer Toolbelt (`@ai-crew-suite/crew-cli`)
 
-This package is the centralized developer toolbelt and workspace orchestrator for the AI Crew Suite monorepo. It consolidates all building, cleaning, linting, typechecking, and testing workflows into a single, high-performance binary utility.
+This package is the centralized developer toolbelt and workspace orchestrator for use in AI Crew Suite repos. It consolidates all building, cleaning, linting, typechecking, and testing workflows into a single, high-performance binary utility.
 
 By managing tooling constraints centrally within this package, we can upgrade, patch, or alter repo-wide build steps without touching or changing individual package script blocks across our 60+ workspaces.
 
@@ -66,6 +66,7 @@ crew lint --fix
 | --- | --- | --- |
 | **`crew clean`** | Clears local caching matrices and `dist/` folders safely with root guards. | Cache Bypass |
 | **`crew build`** | Wraps backstage-cli package compilation rules. | Cacheable (`dist/**`) |
+| **`crew format`** | Run automated text style formatting across the workspace layout via Prettier. | Cacheable |
 | **`crew lint`** | Performs zero-config ESLint Flat rules evaluations. | Cacheable |
 | **`crew typecheck`** | Forces local `tsc --noEmit` compiler checks. | Cacheable |
 | **`crew sync:refs`** | Synchronizes TypeScript Project References alphabetically and heals roots. | Cache Bypass |

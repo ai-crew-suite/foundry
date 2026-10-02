@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="JsonSchemaMappingsProjectConfiguration">
+    <state>
+      <!-- 1. Yarnrc Schema Mapping -->
+      <mapping>
+        <name>YarnRC Config</name>
+        <url>https://yarnpkg.com/configuration/yarnrc.json</url>
+        <file-patterns>
+          <file-pattern value=".yarnrc.yml" />
+        </file-patterns>
+      </mapping>
+      <!-- 2. Backstage Catalog Schema Mapping -->
+      <mapping>
+        <name>Backstage Catalog Info</name>
+        <url>https://json.schemastore.org/catalog-info.json</url>
+        <file-patterns>
+          <file-pattern value="**/catalog-info.yaml" />
+          <file-pattern value="master-catalogs.yml" />
+        </file-patterns>
+      </mapping>
+    </state>
+  </component>
+</project>
