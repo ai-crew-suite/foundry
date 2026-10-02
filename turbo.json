@@ -24,6 +24,10 @@
     "clean": {
       "cache": false
     },
+    "format": {
+      "dependsOn": [],
+      "outputs": []
+    },
     "lint": {
       "dependsOn": [],
       "outputs": []
