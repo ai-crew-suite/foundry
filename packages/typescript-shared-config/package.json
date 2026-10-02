@@ -35,18 +35,26 @@
     "./web": "./web.json"
   },
   "scripts": {
-    "clean": "shx rm -rf dist",
-    "build": "yarn clean && shx mkdir -p dist && shx cp src/default.json dist/default.json",
+    "clean": "shx rm -rf dist && shx mkdir -p dist",
+    "build": "yarn clean && yarn build:node && yarn build:web",
+    "build:node": "yarn tsx src/scripts/merge-tsconfig.ts src/node.json dist/node.json",
+    "build:web": "yarn tsx src/scripts/merge-tsconfig.ts src/web.json dist/web.json",
+    "lint": "prettier --check \"src/**/*.json\" \"*.json\" && yarn lint:node && yarn lint:web",
+    "lint:node": "tsc --project src/node.json --showConfig > /dev/null",
+    "lint:web": "tsc --project src/web.json --showConfig > /dev/null",
+    "test:unit": "vitest run src/scripts/__tests__/merge-tsconfig.test.ts",
+    "format": "prettier --write \"src/**/*.json\" \"*.json\"",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "workspace:*",
     "@rollup/plugin-typescript": "catalog:dev",
+    "@types/node": "catalog:dev",
     "rollup": "catalog:dev",
     "rollup-plugin-dts": "catalog:dev",
     "shx": "catalog:dev",
-    "tslib": "catalog:dev",
-    "typescript": "catalog:dev"
+    "tsx": "catalog:dev",
+    "vitest": "catalog:dev"
   },
   "peerDependencies": {
     "typescript": "*"

@@ -125,11 +125,12 @@ __metadata:
   dependencies:
     "@ai-crew-suite/crew-cli": "workspace:*"
     "@rollup/plugin-typescript": "catalog:dev"
+    "@types/node": "catalog:dev"
     rollup: "catalog:dev"
     rollup-plugin-dts: "catalog:dev"
     shx: "catalog:dev"
-    tslib: "catalog:dev"
-    typescript: "catalog:dev"
+    tsx: "catalog:dev"
+    vitest: "catalog:dev"
   peerDependencies:
     typescript: "*"
   languageName: unknown
