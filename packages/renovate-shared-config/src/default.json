@@ -2,14 +2,14 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:best-practices",
-    "helpers:pinGitHubActionDigestsToSemver"
+    "helpers:pinGitHubActions"
   ],
   "schedule": ["on tuesday"],
   "customManagers": [
     {
       "description": "Extract and update the version inside the root backstage.json file",
       "customType": "regex",
-      "fileMatch": ["^backstage\\.json"],
+      "fileMatch": ["backstage.json"],
       "matchStrings": ["\"version\":\\s*\"(?<currentValue>[^\"]+)\""],
       "depNameTemplate": "@backstage/core",
       "datasourceTemplate": "npm"
@@ -18,31 +18,31 @@
   "packageRules": [
     {
       "description": "CRITICAL PIN: Clamp React ecosystem to v18 to respect Backstage core restraint [#28080](https://github.com/backstage/backstage/issues/28080)",
-      "matchManagers": ["yarn-catalogs", "npm"],
+      "matchManagers": ["yarn"],
       "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
       "allowedVersions": "^18.3.1"
     },
     {
       "description": "CRITICAL PIN: Clamp testing infrastructure to React 18 compatible streams",
-      "matchManagers": ["yarn-catalogs"],
+      "matchManagers": ["yarn"],
       "matchPackageNames": ["@testing-library/react"],
       "allowedVersions": "^15.0.0"
     },
     {
       "description": "CRITICAL PIN: Clamp routing streams below v7 to preserve plugin relativeSplatPath behaviors",
-      "matchManagers": ["yarn-catalogs", "npm"],
+      "matchManagers": ["yarn"],
       "matchPackageNames": ["react-router", "react-router-dom"],
       "allowedVersions": "^6.30.0"
     },
     {
       "description": "CRITICAL PIN: Block Material UI v9+ to eliminate React 19 peer clashes",
-      "matchManagers": ["yarn-catalogs"],
+      "matchManagers": ["yarn"],
       "matchPackageNames": ["@mui/material"],
       "allowedVersions": "^7.3.0"
     },
     {
       "description": "CRITICAL PIN: Enforce version range constraints for TypeScript compiler targets",
-      "matchManagers": ["yarn-catalogs"],
+      "matchManagers": ["yarn"],
       "matchPackageNames": ["typescript"],
       "allowedVersions": "^6.0.0"
     },
@@ -74,7 +74,7 @@
     },
     {
       "description": "Group and annotate upgrades modifying the production catalog to remind devs to increment the root version key",
-      "matchManagers": ["yarn-catalogs"],
+      "matchManagers": ["yarn"],
       "matchDepTypes": ["yarn.catalog.prod"],
       "groupName": "Production Runtime Dependencies",
       "prBodyNotes": [
@@ -89,7 +89,7 @@
     },
     {
       "description": "Group and annotate upgrades modifying devDependencies or the dev catalog that they do NOT need a root version bump",
-      "matchManagers": ["yarn-catalogs", "npm"],
+      "matchManagers": ["yarn"],
       "matchDepTypes": ["yarn.catalog.dev"],
       "groupName": "Development & Tooling Tools",
       "prBodyNotes": [

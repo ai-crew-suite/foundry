@@ -48,11 +48,9 @@ To inherit these global dependency standards and automated PR note templates ins
 Create or edit your target application's local `renovate.json` file:
 
 ```json
-// consumer-repo/renovate.json
 {
-  "$schema": "https://renovatebot.com",
   "extends": [
-    "github>ai-crew-suite/foundry//packages/renovate-config/global-rules.json"
+    "npm>@ai-crew-suite/renovate-shared-config"
   ]
 }
 ```

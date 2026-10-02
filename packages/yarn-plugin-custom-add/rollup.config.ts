@@ -17,20 +17,20 @@ import type { RollupOptions } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 
 const config: RollupOptions = {
-input: "src/index.ts",
-output: {
-file: "dist/plugin.cjs",
-format: "cjs",
-exports: "default",
-sourcemap: false
-},
-plugins: [
-typescript({
-tsconfig: "./tsconfig.json"
-})
-],
-// Treat Yarn engine internals and Node built-ins as external so they aren't bundled inside
-external: (id) => id === "@yarnpkg/core" || id.startsWith("node:")
+  input: "src/index.ts",
+  output: {
+    file: "dist/plugin.cjs",
+    format: "cjs",
+    exports: "default",
+    sourcemap: false
+  },
+  plugins: [
+    typescript({
+      tsconfig: "./tsconfig.json"
+    })
+  ],
+  // Treat Yarn engine internals and Node built-ins as external so they aren't bundled inside
+  external: (id) => id === "@yarnpkg/core" || id.startsWith("node:")
 };
 
 export default config;

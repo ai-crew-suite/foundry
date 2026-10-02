@@ -35,8 +35,8 @@
     "./web": "./web.json"
   },
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin typescript",
+    "clean": "shx rm -rf dist",
+    "build": "yarn clean && shx mkdir -p dist && shx cp src/default.json dist/default.json",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
@@ -44,6 +44,7 @@
     "@rollup/plugin-typescript": "catalog:dev",
     "rollup": "catalog:dev",
     "rollup-plugin-dts": "catalog:dev",
+    "shx": "catalog:dev",
     "tslib": "catalog:dev",
     "typescript": "catalog:dev"
   },

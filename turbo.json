@@ -11,7 +11,7 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "sync"],
+      "dependsOn": [],
       "outputs": ["dist/**"],
       "env": [
         "FORCE_COLOR",
@@ -52,12 +52,12 @@
       ]
     },
     "test:unit": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": [],
       "cache": true
     },
     "test:unit:coverage": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "inputs": [
         "src/**/*",
         "src/**/*.test.ts"
