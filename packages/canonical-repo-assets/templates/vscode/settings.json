@@ -15,6 +15,9 @@
       "url": "https://yarnpkg.com/configuration/yarnrc.json"
     }
   ],
+  "json.schemaDownload.trustedDomains": {
+    "https://*.turborepo.dev": true
+  },
   "search.exclude": {
     "**/.yarn": true,
     "**/node_modules": true,

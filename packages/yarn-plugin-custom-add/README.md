@@ -35,16 +35,15 @@ After it runs, re-run `yarn install` to link the new catalog entry.
 
 ## Local Development Workflow
 
-Build the plugin before registering it with Yarn:
-
 ```sh
-yarn workspace @ai-crew-suite/yarn-plugin-custom-add build
-```
+# Verify formatting and linting
+yarn turbo run lint --filter=@ai-crew-suite/yarn-plugin-custom-add
 
-Run the unit tests:
+# Run tests
+yarn turbo run test:unit --filter=@ai-crew-suite/yarn-plugin-custom-add
 
-```sh
-yarn workspace @ai-crew-suite/yarn-plugin-custom-add test:unit
+# Build
+yarn turbo run build --filter=@ai-crew-suite/yarn-plugin-custom-add
 ```
 
 To use a published copy in another repository, copy `dist/plugin.cjs` to `.yarn/plugins/yarn-plugin-custom-add.cjs` and register it in `.yarnrc.yml`:

@@ -36,8 +36,8 @@
     "dist"
   ],
   "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin typescript",
+    "clean": "crew clean",
+    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin esbuild",
     "lint": "crew lint",
     "test:unit": "crew test:unit",
     "test:unit:coverage": "crew test:unit:coverage",
@@ -47,9 +47,11 @@
     "typescript": "catalog:prod"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "catalog:dev",
     "@types/node": "catalog:dev",
+    "esbuild": "catalog:dev",
     "rollup": "catalog:dev",
+    "rollup-plugin-dts": "catalog:dev",
+    "rollup-plugin-esbuild": "catalog:dev",
     "vitest": "catalog:prod"
   }
 }

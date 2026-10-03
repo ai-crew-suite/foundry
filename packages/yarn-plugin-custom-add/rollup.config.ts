@@ -14,23 +14,41 @@
  * limitations under the License.
  */
 import type { RollupOptions } from "rollup";
-import typescript from "@rollup/plugin-typescript";
+import esbuild from "rollup-plugin-esbuild";
+import dts from "rollup-plugin-dts";
 
-const config: RollupOptions = {
-  input: "src/index.ts",
-  output: {
-    file: "dist/plugin.cjs",
-    format: "cjs",
-    exports: "default",
-    sourcemap: false
+const config: RollupOptions[] = [
+  // 1. Build the JavaScript/CommonJS bundle
+  {
+    input: "src/index.ts",
+    output: {
+      file: "dist/plugin.cjs",
+      format: "cjs",
+      exports: "default",
+      sourcemap: false
+    },
+    plugins: [
+      esbuild({
+        tsconfig: "./tsconfig.json"
+      })
+    ],
+    // Treat Yarn engine internals and Node built-ins as external so they aren't bundled inside
+    external: (id) => id === "@yarnpkg/core" || id.startsWith("node:")
   },
-  plugins: [
-    typescript({
-      tsconfig: "./tsconfig.json"
-    })
-  ],
-  // Treat Yarn engine internals and Node built-ins as external so they aren't bundled inside
-  external: (id) => id === "@yarnpkg/core" || id.startsWith("node:")
-};
+  // 2. Build and bundle the type declarations (.d.ts)
+  {
+    input: "src/index.ts",
+    output: {
+      file: "dist/plugin.d.ts",
+      format: "es"
+    },
+    plugins: [
+      dts({
+        tsconfig: "./tsconfig.json"
+      })
+    ],
+    external: (id) => id === "@yarnpkg/core" || id.startsWith("node:")
+  }
+];
 
 export default config;

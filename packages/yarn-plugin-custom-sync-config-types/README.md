@@ -17,16 +17,15 @@ This keeps `config.d.ts` self-contained for config-schema loading while ensuring
 
 ## Local Development Workflow
 
-Build the package before publishing or linking it locally:
-
 ```sh
-yarn workspace @ai-crew-suite/yarn-plugin-custom-sync-config-types build
-```
+# Verify formatting and linting
+yarn turbo run lint --filter=@ai-crew-suite/yarn-plugin-custom-sync-config-types
 
-Run the unit tests:
+# Run tests
+yarn turbo run test:unit --filter=@ai-crew-suite/yarn-plugin-custom-sync-config-types
 
-```sh
-yarn workspace @ai-crew-suite/yarn-plugin-custom-sync-config-types test:unit
+# Build
+yarn turbo run build --filter=@ai-crew-suite/yarn-plugin-custom-sync-config-types
 ```
 
 ## Consumer Usage

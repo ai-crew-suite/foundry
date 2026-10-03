@@ -25,18 +25,5 @@
   "files": [
     "manifest.json",
     "README.md"
-  ],
-  "scripts": {
-    "clean": "rm -rf dist",
-    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin typescript",
-    "prepublishOnly": "npm run build"
-  },
-  "devDependencies": {
-    "@ai-crew-suite/crew-cli": "workspace:*",
-    "@rollup/plugin-typescript": "catalog:dev",
-    "rollup": "catalog:dev",
-    "rollup-plugin-dts": "catalog:dev",
-    "tslib": "catalog:dev",
-    "typescript": "catalog:dev"
-  }
+  ]
 }

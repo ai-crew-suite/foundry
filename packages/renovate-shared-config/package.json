@@ -34,9 +34,8 @@
   "scripts": {
     "clean": "shx rm -rf dist",
     "build": "yarn clean && shx mkdir -p dist && shx cp src/default.json dist/default.json",
-    "lint": "prettier --check \"src/**/*.json\" \"*.json\" && renovate-config-validator src/default.json",
     "format": "prettier --write \"src/**/*.json\" \"*.json\"",
-    "prepublishOnly": "npm run build"
+    "lint": "prettier --check \"src/**/*.json\" \"*.json\" && renovate-config-validator src/default.json"
   },
   "devDependencies": {
     "prettier": "catalog:dev",

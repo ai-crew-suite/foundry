@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2026 The AI Crew Suite Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import type { Plugin } from "@yarnpkg/core";
-import { CustomAddCommand } from "./commands/add.js";
-
-export type YarnFactoryRequire = (id: string) => any;
-
-export type YarnPluginDefinition = {
+export interface PackageSpec {
   name: string;
-  factory: (require: YarnFactoryRequire) => Plugin;
-};
+  range?: string;
+}
 
-const plugin: YarnPluginDefinition = {
-  name: "@ai-crew-suite/yarn-plugin-custom-add",
-  factory: (_require: YarnFactoryRequire): Plugin => ({
-    commands: [CustomAddCommand],
-  }),
-};
+export function parsePackageSpec(spec: string): PackageSpec {
+  const atIndex = spec.startsWith("@") ? spec.indexOf("@", 1) : spec.indexOf("@");
 
-export default plugin;
+  if (atIndex === -1) {
+    return { name: spec };
+  }
+
+  return { name: spec.slice(0, atIndex), range: spec.slice(atIndex + 1) };
+}

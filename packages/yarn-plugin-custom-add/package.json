@@ -32,7 +32,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin typescript",
+    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin esbuild",
     "clean": "crew clean",
     "lint": "crew lint",
     "test": "yarn test:unit",
@@ -41,13 +41,15 @@
     "typecheck": "crew typecheck"
   },
   "dependencies": {
-    "@yarnpkg/core": "catalog:dev"
+    "@yarnpkg/core": "catalog:prod",
+    "clipanion": "catalog:prod"
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "workspace:*",
-    "@rollup/plugin-typescript": "catalog:dev",
+    "esbuild": "catalog:dev",
     "rollup": "catalog:dev",
     "rollup-plugin-dts": "catalog:dev",
+    "rollup-plugin-esbuild": "catalog:dev",
     "tslib": "catalog:dev",
     "typescript": "catalog:dev"
   }

@@ -1,0 +1,77 @@
+{
+  "$schema": "https://v2-11-7.turborepo.dev/schema.json",
+  "globalEnv": [
+    "NODE_ENV",
+    "CI",
+    "BACKSTAGE_APP_CONFIG",
+    "BACKSTAGE_USER_SECRET",
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD"
+  ],
+  "tasks": {
+    "build": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "package.json"],
+      "outputs": ["dist/**"],
+      "env": [
+        "FORCE_COLOR",
+        "PLAYWRIGHT_APP_HOST",
+        "PLAYWRIGHT_APP_PORT",
+        "PLAYWRIGHT_BACKEND_HOST",
+        "PLAYWRIGHT_BACKEND_PORT"
+      ]
+    },
+    "clean": {
+      "cache": false
+    },
+    "format": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
+    },
+    "publish": {
+      /** Publishing should never be cached, it must always execute online */
+      "cache": false,
+      "dependsOn": ["^lint", "^typecheck", "^test:unit", "^build"]
+    },
+    /** Synchronizes TypeScript Project References alphabetically and heals roots */
+    "sync": {
+      "cache": false,
+      "dependsOn": [],
+      "inputs": ["packages/**/package.json"],
+      "outputs": ["packages/**/tsconfig.json", "tsconfig.json"]
+    },
+    "test": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"]
+    },
+    "test:unit": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"],
+      "outputs": []
+    },
+    "test:unit:coverage": {
+      "cache": true,
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"],
+      "outputs": ["coverage/**"]
+    },
+    "typecheck": {
+      "cache": true,
+      /** TypeScript needs built internal dependency declarations (.d.ts) */
+      "dependsOn": ["^build"],
+      "inputs": ["src/**", "tsconfig.json"],
+      "outputs": []
+    }
+  }
+}

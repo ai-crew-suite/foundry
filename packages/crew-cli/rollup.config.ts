@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'rollup';
-import typescript from '@rollup/plugin-typescript';
-import resolve from '@rollup/plugin-node-resolve';
 import { globSync } from 'glob';
-import path from 'node:path';
+import { defineConfig } from 'rollup';
+import dts from "rollup-plugin-dts";
+import esbuild from "rollup-plugin-esbuild";
 import fs from 'node:fs';
+import path from 'node:path';
+import resolve from '@rollup/plugin-node-resolve';
 
 const currentDir = import.meta.dirname;
 
@@ -32,60 +33,81 @@ const outputDir = path.resolve(currentDir, 'dist/bin');
 
 const executableEntryPattern = /\/src\/bin\/(crew|commands\/[^/]+\/index)\.ts$/;
 
-export default defineConfig({
-  input: entryPoints,
-  output: {
-    dir: path.resolve(currentDir, 'dist/bin'),
-    format: 'esm',
-    sourcemap: true,
-    preserveModules: true,
-    preserveModulesRoot: path.resolve(currentDir, 'src/bin'),
-    entryFileNames: '[name].js',
-    /** Inject a shebang only into files intended to be invoked directly. */
-    banner: ({ facadeModuleId }) =>
-      facadeModuleId && executableEntryPattern.test(facadeModuleId)
-        ? '#!/usr/bin/env node\n'
-        : '',
-  },
-  external: (id) => {
-    /** Keep relative imports and internal source files bundled/resolved correctly */
-    if (id.startsWith('.') || path.isAbsolute(id)) {
-      return false;
-    }
-    /** Force ALL node_modules packages, node built-ins, and third-party tools to be external */
-    return true;
-  },
-  plugins: [
-    resolve(),
-    typescript({
-      tsconfig: path.resolve(currentDir, './tsconfig.json'),
-      declaration: false,
-      outDir: outputDir,
-      sourceMap: true
-    }),
-    {
-      name: 'make-executable',
-      writeBundle() {
-        if (process.platform !== 'win32') {
-          /** Make the main entry binary executable */
-          const entryPath = path.resolve(currentDir, 'dist/bin/crew.js');
+/** Shared external module checker function */
+const externalChecker = (id) => {
+  /** Keep relative imports and internal source files bundled/resolved correctly */
+  if (id.startsWith('.') || path.isAbsolute(id)) {
+    return false;
+  }
+  /** Force ALL node_modules packages, node built-ins, and third-party tools to be external */
+  return true;
+};
 
-          if (fs.existsSync(entryPath)) {
-            fs.chmodSync(entryPath, 0o755);
-          }
+export default defineConfig([
+  // 1. Build the JavaScript/ESM modules with esbuild
+  {
+    input: entryPoints,
+    output: {
+      dir: outputDir,
+      format: 'esm',
+      sourcemap: true,
+      preserveModules: true,
+      preserveModulesRoot: path.resolve(currentDir, 'src/bin'),
+      entryFileNames: '[name].js',
+      /** Inject a shebang only into files intended to be invoked directly. */
+      banner: ({ facadeModuleId }) =>
+        facadeModuleId && executableEntryPattern.test(facadeModuleId)
+          ? '#!/usr/bin/env node\n'
+          : '',
+    },
+    external: externalChecker,
+    plugins: [
+      resolve(),
+      esbuild({
+        tsconfig: path.resolve(currentDir, './tsconfig.json')
+      }),
+      {
+        name: 'make-executable',
+        writeBundle() {
+          if (process.platform !== 'win32') {
+            /** Make the main entry binary executable */
+            const entryPath = path.resolve(currentDir, 'dist/bin/crew.js');
 
-          /** Make all nested command binaries executable */
-          const commandFiles = globSync(path.resolve(currentDir, 'dist/bin/commands/**/*.js'));
-
-          for (const file of commandFiles) {
-            if (fs.existsSync(file)) {
-              fs.chmodSync(file, 0o755);
+            if (fs.existsSync(entryPath)) {
+              fs.chmodSync(entryPath, 0o755);
             }
-          }
 
-          console.log('⚡ Main binary and all subcommands marked as executable!');
+            /** Make all nested command binaries executable */
+            const commandFiles = globSync(path.resolve(currentDir, 'dist/bin/commands/**/*.js'));
+
+            for (const file of commandFiles) {
+              if (fs.existsSync(file)) {
+                fs.chmodSync(file, 0o755);
+              }
+            }
+
+            console.log('⚡ Main binary and all subcommands marked as executable!');
+          }
         }
       }
-    }
-  ]
-});
+    ]
+  },
+  // 2. Build and bundle corresponding type definitions (.d.ts) preserving structure
+  {
+    input: entryPoints,
+    output: {
+      dir: outputDir,
+      format: 'esm',
+      preserveModules: true,
+      preserveModulesRoot: path.resolve(currentDir, 'src/bin'),
+      entryFileNames: '[name].d.ts',
+    },
+    external: externalChecker,
+    plugins: [
+      resolve(),
+      dts({
+        tsconfig: path.resolve(currentDir, './tsconfig.json')
+      })
+    ]
+  }
+]);

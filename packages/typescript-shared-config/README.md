@@ -28,6 +28,13 @@ This package exports raw JSON configuration footprints. No intermediate bundle p
 
 ```bash
 yarn install --refresh
+# Verify formatting and linting
+yarn turbo run lint --filter=@ai-crew-suite/tsconfig-base
+
+# Run tests
+yarn turbo run test:unit --filter=@ai-crew-suite/tsconfig-base
+
+# Build
 yarn turbo run build --filter=@ai-crew-suite/tsconfig-base
 ```
 

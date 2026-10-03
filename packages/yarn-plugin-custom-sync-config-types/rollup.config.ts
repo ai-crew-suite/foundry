@@ -14,29 +14,49 @@
  * limitations under the License.
  */
 import type { RollupOptions } from "rollup";
-import typescript from "@rollup/plugin-typescript";
+import esbuild from "rollup-plugin-esbuild";
+import dts from "rollup-plugin-dts";
 
-const config: RollupOptions = {
-  input: {
-    sync: "src/sync.ts",
-    bin: "src/bin.ts"
+const config: RollupOptions[] = [
+  // 1. Build the JavaScript/ESM bundles
+  {
+    input: {
+      sync: "src/sync.ts",
+      bin: "src/bin.ts"
+    },
+    output: {
+      dir: "dist",
+      format: "es",
+      sourcemap: false,
+      entryFileNames: "[name].js",
+      /** Inject a shebang only into the executable CLI entry. */
+      banner: (chunk) => (chunk.name === "bin" ? "#!/usr/bin/env node\n" : "")
+    },
+    plugins: [
+      esbuild({
+        tsconfig: "./tsconfig.json"
+      })
+    ],
+    external: (id) => id === "typescript" || id.startsWith("node:")
   },
-  output: {
-    dir: "dist",
-    format: "es",
-    sourcemap: false,
-    entryFileNames: "[name].js",
-    /** Inject a shebang only into the executable CLI entry. */
-    banner: (chunk) => (chunk.name === "bin" ? "#!/usr/bin/env node\n" : "")
-  },
-  plugins: [
-    typescript({
-      tsconfig: "./tsconfig.json",
-      declaration: true,
-      declarationDir: "dist"
-    })
-  ],
-  external: (id) => id === "typescript" || id.startsWith("node:")
-};
+  // 2. Build and bundle the type declarations (.d.ts) for both entries
+  {
+    input: {
+      sync: "src/sync.ts",
+      bin: "src/bin.ts"
+    },
+    output: {
+      dir: "dist",
+      format: "es",
+      entryFileNames: "[name].d.ts"
+    },
+    plugins: [
+      dts({
+        tsconfig: "./tsconfig.json"
+      })
+    ],
+    external: (id) => id === "typescript" || id.startsWith("node:")
+  }
+];
 
 export default config;

@@ -13,8 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+// packages/yarn-plugin-custom-add/src/__tests__/catalogFile.test.ts
 import { describe, expect, it } from 'vitest';
-import { upsertCatalogEntry } from '../lib/catalogFile.js';
+import {
+  isTopLevelLine,
+  isCatalogEntryLine,
+  escapeForRegExp,
+  locateCatalogBlock,
+  findCatalogInsertionPoint,
+  upsertCatalogEntry,
+  type CatalogBlockRange
+} from '../lib/catalogFile.js';
 
 const SAMPLE_YARNRC = [
   'yarnPath: .yarn/releases/yarn-4.18.0.cjs',
@@ -32,15 +41,95 @@ const SAMPLE_YARNRC = [
   '',
 ].join('\n');
 
+describe('isTopLevelLine', () => {
+  it('returns false for undefined input', () => {
+    expect(isTopLevelLine(undefined)).toBe(false);
+  });
+
+  it('returns false for empty lines or space-indented configuration parameters', () => {
+    expect(isTopLevelLine('')).toBe(false);
+    expect(isTopLevelLine('  prod:')).toBe(false);
+    expect(isTopLevelLine('    "chalk": "^6.0.1"')).toBe(false);
+  });
+
+  it('returns false for root-level comments', () => {
+    expect(isTopLevelLine('# this is a comment')).toBe(false);
+  });
+
+  it('returns true for genuine root-level configuration attributes', () => {
+    expect(isTopLevelLine('yarnPath: .yarn/releases/yarn-4.18.0.cjs')).toBe(true);
+    expect(isTopLevelLine('catalogs:')).toBe(true);
+  });
+});
+
+describe('isCatalogEntryLine', () => {
+  it('returns false for undefined input', () => {
+    expect(isCatalogEntryLine(undefined)).toBe(false);
+  });
+
+  it('returns false for headers or top-level entries', () => {
+    expect(isCatalogEntryLine('catalogs:')).toBe(false);
+    expect(isCatalogEntryLine('  prod:')).toBe(false);
+    expect(isCatalogEntryLine('  # comment')).toBe(false);
+  });
+
+  it('returns true only if the string starts with exactly 4 spaces', () => {
+    expect(isCatalogEntryLine('    "chalk": "^6.0.1"')).toBe(true);
+    expect(isCatalogEntryLine('    lodash: "^4.17.21"')).toBe(true);
+  });
+});
+
+describe('escapeForRegExp', () => {
+  it('escapes regular expression special injection characters securely', () => {
+    expect(escapeForRegExp('lodash')).toBe('lodash');
+    expect(escapeForRegExp('@scope/pkg-name')).toBe('@scope/pkg-name');
+    expect(escapeForRegExp('react.js')).toBe('react\\.js');
+    expect(escapeForRegExp('a[b]c*d+e?')).toBe('a\\[b\\]c\\*d\\+e\\?');
+  });
+});
+
+describe('locateCatalogBlock', () => {
+  const lines = SAMPLE_YARNRC.split('\n');
+  const catalogsIndex = lines.findIndex(l => l === 'catalogs:');
+
+  it('correctly maps the exact line bounds of an active catalog block', () => {
+    const range = locateCatalogBlock(lines, catalogsIndex, '  prod:');
+    expect(range).toBeDefined();
+
+    // Using interface validation naturally
+    const validatedRange: CatalogBlockRange = range!;
+    expect(lines[validatedRange.headerIndex]).toBe('  prod:');
+    // blockEndIndex points to the line immediately following the block entries
+    expect(lines[validatedRange.blockEndIndex]).toBe('');
+  });
+
+  it('returns undefined if requested nested block is missing', () => {
+    const range = locateCatalogBlock(lines, catalogsIndex, '  missing-catalog:');
+    expect(range).toBeUndefined();
+  });
+
+  it('stops scanning immediately if a new root-level keyword parameter intervenes', () => {
+    const customRc = ['catalogs:', 'nodeLinker: node-modules', '  prod:', '    "a": "1"'];
+    const range = locateCatalogBlock(customRc, 0, '  prod:');
+    expect(range).toBeUndefined();
+  });
+});
+
+describe('findCatalogInsertionPoint', () => {
+  it('finds the index right before the next root configuration element', () => {
+    const customRc = ['yarnPath: x', 'catalogs:', '  prod:', '    "a": "1"', '', 'nodeLinker: pnp'];
+    const insertAt = findCatalogInsertionPoint(customRc, 1);
+    expect(insertAt).toBe(5); // points to 'nodeLinker: pnp'
+  });
+});
+
 describe('upsertCatalogEntry', () => {
   it('inserts a new entry at the end of the named catalog block', () => {
     const result = upsertCatalogEntry(SAMPLE_YARNRC, 'prod', 'lodash', '^4.17.21');
     const lines = result.split('\n');
 
     expect(lines).toContain('    "lodash": "^4.17.21"');
-    // Inserted after the last existing "prod" entry, before the blank separator line.
     expect(lines.indexOf('    "lodash": "^4.17.21"')).toBe(lines.indexOf('    "chalk": "^6.0.1"') + 1);
-    // The "dev" catalog is untouched.
     expect(result).toContain('    "@types/node": "^26.1.1"');
     expect(result).toContain('    "rollup": "^4.63.5"');
   });
@@ -50,8 +139,16 @@ describe('upsertCatalogEntry', () => {
 
     expect(result).toContain('    "chalk": "^7.0.0"');
     expect(result).not.toContain('"chalk": "^6.0.1"');
-    // No duplicate line was added.
     expect(result.match(/"chalk":/g)).toHaveLength(1);
+  });
+
+  it('updates unquoted historical dependency entries safely without duplicating them', () => {
+    const legacyYarnrc = ['catalogs:', '  prod:', '    chalk: "^6.0.1"', ''].join('\n');
+    const result = upsertCatalogEntry(legacyYarnrc, 'prod', 'chalk', '^7.0.0');
+
+    expect(result).toContain('    "chalk": "^7.0.0"');
+    expect(result).not.toContain('chalk:');
+    expect(result.match(/chalk/g)).toHaveLength(1);
   });
 
   it('writes into the requested catalog, not a different one', () => {

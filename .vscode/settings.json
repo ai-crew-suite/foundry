@@ -9,6 +9,9 @@
     "source.fixAll.eslint": "explicit"
   },
   "editor.formatOnSave": true,
+  "json.schemaDownload.trustedDomains": {
+    "https://*.turborepo.dev": true
+  },
   "json.schemas": [
     {
       "fileMatch": [".yarnrc.yml"],

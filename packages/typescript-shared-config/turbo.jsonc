@@ -1,0 +1,29 @@
+{
+  "extends": ["//"],
+  "tasks": {
+    "build:node": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/scripts/merge-tsconfig.ts", "src/base.json", "src/node.json"],
+      "outputs": ["dist/node.json"]
+    },
+    "build:web": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/scripts/merge-tsconfig.ts", "src/base.json", "src/web.json"],
+      "outputs": ["dist/web.json"]
+    },
+    "lint:node": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/base.json", "src/node.json"],
+      "outputs": []
+    },
+    "lint:web": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/base.json", "src/web.json"],
+      "outputs": []
+    }
+  }
+}

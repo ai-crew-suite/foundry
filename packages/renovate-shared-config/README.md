@@ -28,7 +28,12 @@ Because this is a static declaration block, it requires no local compilation or 
 
 ```bash
 yarn install --refresh
-yarn workspace @ai-crew-suite/renovate-config test
+
+# Verify formatting and linting
+yarn turbo run lint --filter=@ai-crew-suite/renovate-config test
+
+# Run tests
+yarn turbo run test:unit --filter=@ai-crew-suite/renovate-config test
 ```
 
 ### Running Verification Tracks Local Dry-Runs
