@@ -58,7 +58,7 @@ describe('resolveLatestRange via Yarn Core Engine', () => {
 
     expect(result).toBe('^4.17.21');
     expect(httpUtils.get).toHaveBeenCalledWith(
-      'https://npmjs.orglodash',
+      'https://npmjs.org/lodash',
       expect.objectContaining({ configuration: mockConfiguration, jsonResponse: true })
     );
   });
@@ -88,7 +88,7 @@ describe('resolveLatestRange via Yarn Core Engine', () => {
 
     expect(result).toBe('^1.0.0');
     expect(httpUtils.get).toHaveBeenCalledWith(
-      'https://ai-crew-suite.internal@ai-crew-suite/shared-utils',
+      'https://ai-crew-suite.internal/@ai-crew-suite/shared-utils',
       expect.any(Object)
     );
   });

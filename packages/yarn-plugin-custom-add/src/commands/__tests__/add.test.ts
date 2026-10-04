@@ -59,6 +59,7 @@ vi.mock('@yarnpkg/core', async (importOriginal) => {
   };
 });
 
+import { Cache, StreamReport } from '@yarnpkg/core';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { confirm } from '../../lib/confirm';
 import { resolveLatestRange } from '../../lib/npmRegistry';
@@ -71,6 +72,14 @@ describe('CustomAddCommand', () => {
 
   beforeEach(() => {
     vi.resetAllMocks();
+
+    // resetAllMocks wipes factory-defined implementations, so restore them here
+    vi.mocked(Cache.find).mockResolvedValue({} as any);
+    vi.mocked(StreamReport.start).mockImplementation(async (_opts: any, cb: any) => {
+      const mockReport = { hasErrors: vi.fn().mockReturnValue(false) };
+      await cb(mockReport);
+      return mockReport as any;
+    });
 
     // Prevent Cache.find from breaking by mocking its map lookup interface method
     mockConfiguration = {
@@ -178,7 +187,7 @@ describe('CustomAddCommand', () => {
       packageJsonPath: '/mock/repo/root/packages/core/package.json',
     });
     vi.mocked(parsePackageSpec).mockReturnValue({ name: 'chalk', range: undefined });
-    vi.mocked(resolveLatestRange).mockResolvedValue('^x.x.x');
+    vi.mocked(resolveLatestRange).mockResolvedValue('^5.3.0');
     vi.mocked(readFileSync).mockReturnValue('{}');
 
     const exitCode = await command.execute();
