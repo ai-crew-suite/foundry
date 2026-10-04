@@ -38,7 +38,10 @@ export function upsertCatalogDependency(
 
   const sorted: Record<string, string> = {};
   for (const key of Object.keys(dependencies).sort((a, b) => a.localeCompare(b))) {
-    sorted[key] = dependencies[key];
+    const value = dependencies[key];
+    if (value !== undefined) {
+      sorted[key] = value;
+    }
   }
 
   manifest[field] = sorted;

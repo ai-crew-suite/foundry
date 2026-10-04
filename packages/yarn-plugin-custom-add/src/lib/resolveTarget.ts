@@ -14,7 +14,16 @@
  * limitations under the License.
  */
 import { resolve } from "node:path";
-import { npath, structUtils, type Project } from "@yarnpkg/core";
+import { structUtils, type Project } from "@yarnpkg/core";
+
+/**
+ * Converts a Yarn portable path (always forward slashes) to a native
+ * filesystem path. Mirrors `npath.fromPortablePath` from `@yarnpkg/fslib`,
+ * which is not re-exported at runtime by `@yarnpkg/core`.
+ */
+function fromPortablePath(portablePath: string): string {
+  return process.platform === "win32" ? portablePath.replace(/\//g, "\\") : portablePath;
+}
 
 export interface ResolveTargetOptions {
   repoRoot: string;
@@ -40,7 +49,7 @@ export function resolveTargetPackageJson(options: ResolveTargetOptions): Resolve
     if (workspace.manifest.name) {
       const workspaceName = structUtils.stringifyIdent(workspace.manifest.name);
       if (workspaceName === target) {
-        const fullDir = npath.fromPortablePath(workspace.cwd);
+        const fullDir = fromPortablePath(workspace.cwd);
         return { kind: "package", packageJsonPath: resolve(fullDir, "package.json") };
       }
     }
@@ -49,7 +58,7 @@ export function resolveTargetPackageJson(options: ResolveTargetOptions): Resolve
   // 2. Fall back to relative structural route matching (e.g., "packages/my-app")
   const absoluteTargetDir = resolve(repoRoot, target.replace(/^\.\//, ""));
   for (const workspace of project.workspaces) {
-    const fullDir = npath.fromPortablePath(workspace.cwd);
+    const fullDir = fromPortablePath(workspace.cwd);
     if (fullDir === absoluteTargetDir) {
       return { kind: "package", packageJsonPath: resolve(fullDir, "package.json") };
     }

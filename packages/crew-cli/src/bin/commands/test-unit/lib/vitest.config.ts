@@ -16,11 +16,16 @@
 import { defineConfig } from 'vitest/config';
 import { getWorkspaceContext } from '../../../utils/workspace';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const context = getWorkspaceContext();
 const repoRoot = context.repoRoot;
 
-const setupFilePath = path.resolve(repoRoot, 'packages/cli/dist/bin/commands/test-unit/lib/setup.js');
+// Resolve setup.js relative to this config file's compiled location in
+// crew-cli's dist output, so the path stays valid regardless of the
+// crew-cli package's directory name.
+const configDir = path.dirname(fileURLToPath(import.meta.url));
+const setupFilePath = path.resolve(configDir, 'setup.js');
 const projectName = path.relative(repoRoot, context.packageDir).replace(/\//g, '-') || 'root-suite';
 
 export default defineConfig({
