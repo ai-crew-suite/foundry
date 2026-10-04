@@ -29,7 +29,7 @@
     "crew": "./dist/bin/crew.js"
   },
   "exports": {
-    "./config/eslint": "./dist/bin/commands/lint/lib/factory.js",
+    "./config/eslint": "./dist/bin/commands/lint/config/factory.js",
     "./storybook/mocks": "./src/bin/commands/storybook/lib/mockUtils.ts"
   },
   "files": [

@@ -23,17 +23,18 @@
       ]
     },
     "clean": {
-      "cache": false
+      "cache": false,
+      "dependsOn": ["^build"]
     },
     "format": {
       "cache": true,
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
     "lint": {
       "cache": true,
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$"],
       "outputs": []
     },
@@ -45,7 +46,7 @@
     /** Synchronizes TypeScript Project References alphabetically and heals roots */
     "sync": {
       "cache": false,
-      "dependsOn": [],
+      "dependsOn": ["^build"],
       "inputs": ["packages/**/package.json"],
       "outputs": ["packages/**/tsconfig.json", "tsconfig.json"]
     },

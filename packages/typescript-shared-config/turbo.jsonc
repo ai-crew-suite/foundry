@@ -1,6 +1,11 @@
 {
   "extends": ["//"],
   "tasks": {
+    /** Remove dependsOn from build task that does not depend on Crew CLI for package */
+    "build": {
+      "cache": true,
+      "dependsOn": []
+    },
     "build:node": {
       "cache": true,
       "dependsOn": [],
@@ -12,6 +17,11 @@
       "dependsOn": [],
       "inputs": ["src/scripts/merge-tsconfig.ts", "src/base.json", "src/web.json"],
       "outputs": ["dist/web.json"]
+    },
+    /** Remove dependsOn from lint task that does not depend on Crew CLI for package */
+    "lint": {
+      "cache": true,
+      "dependsOn": []
     },
     "lint:node": {
       "cache": true,

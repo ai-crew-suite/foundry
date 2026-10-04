@@ -27,7 +27,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
  */
 export function runUnitTestsPipeline(context: WorkspaceContext, forwardedArgs: string[]): boolean {
   console.log(
-    `${chalk.blue('🧪 Executing Unit Tests for:')} ${chalk.bold(context.packageName)} ${chalk.gray(`(\${context.role})`)}`
+    `${chalk.blue('🧪 Executing Unit Tests for:')} ${chalk.bold(context.packageName)} ${chalk.gray(`(${context.role})`)}`
   );
 
   const internalConfigPath = path.resolve(__dirname, 'vitest.config.js');

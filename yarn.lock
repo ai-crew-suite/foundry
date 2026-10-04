@@ -109,6 +109,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/renovate-shared-config@workspace:packages/renovate-shared-config"
   dependencies:
+    "@ai-crew-suite/crew-cli": "workspace:*"
     prettier: "catalog:dev"
     renovate: "catalog:dev"
     shx: "catalog:dev"
@@ -120,6 +121,8 @@ __metadata:
   resolution: "@ai-crew-suite/typescript-shared-config@workspace:packages/typescript-shared-config"
   dependencies:
     "@ai-crew-suite/crew-cli": "workspace:*"
+    prettier: "catalog:dev"
+    tsx: "catalog:dev"
     typescript: "catalog:dev"
     vitest: "catalog:dev"
   languageName: unknown

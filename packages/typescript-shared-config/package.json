@@ -48,6 +48,8 @@
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "workspace:*",
+    "prettier": "catalog:dev",
+    "tsx": "catalog:dev",
     "typescript": "catalog:dev",
     "vitest": "catalog:dev"
   }

@@ -34,7 +34,7 @@ const outputDir = path.resolve(currentDir, 'dist/bin');
 const executableEntryPattern = /\/src\/bin\/(crew|commands\/[^/]+\/index)\.ts$/;
 
 /** Shared external module checker function */
-const externalChecker = (id) => {
+const externalChecker = (id: string): boolean => {
   /** Keep relative imports and internal source files bundled/resolved correctly */
   if (id.startsWith('.') || path.isAbsolute(id)) {
     return false;

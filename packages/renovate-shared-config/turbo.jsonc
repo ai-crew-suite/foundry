@@ -1,11 +1,24 @@
 {
   "extends": ["//"],
+  /** Remove dependsOn for package tasks that do not depend on Crew CLI */
   "tasks": {
     "build": {
       "cache": true,
       "dependsOn": [],
       "inputs": ["src/default.json"],
       "outputs": ["dist/default.json"]
+    },
+    "format": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
     }
   }
 }

@@ -1,0 +1,40 @@
+{
+  "extends": ["//"],
+  /** Remove dependsOn for tasks in Crew CLI package */
+  "tasks": {
+    "build": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**", "package.json"],
+      "outputs": ["dist/**"]
+    },
+    "clean": {
+      "cache": false,
+      "dependsOn": []
+    },
+    "lint": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["$TURBO_DEFAULT$"],
+      "outputs": []
+    },
+    "test:unit": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**"],
+      "outputs": []
+    },
+    "test:unit:coverage": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**"],
+      "outputs": ["coverage/**"]
+    },
+    "typecheck": {
+      "cache": true,
+      "dependsOn": [],
+      "inputs": ["src/**", "tsconfig.json"],
+      "outputs": []
+    }
+  }
+}

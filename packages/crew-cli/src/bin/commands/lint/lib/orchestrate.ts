@@ -23,7 +23,7 @@ const require = createRequire(import.meta.url);
 
 export function runLintPipeline(context: WorkspaceContext, forwardedArgs: string[]): boolean {
   console.log(
-    `${chalk.blue('🚨 Executing ESLint Analysis for:')} ${chalk.bold(context.packageName)} ${chalk.gray(`(\${context.role})`)}`
+    `${chalk.blue('🚨 Executing ESLint Analysis for:')} ${chalk.bold(context.packageName)} ${chalk.gray(`(${context.role})`)}`
   );
 
   const eslintPackageJson = require.resolve('eslint/package.json');

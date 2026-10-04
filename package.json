@@ -6,7 +6,7 @@
     "node": "22 || 24",
     "npm": "Please use Yarn instead (Corepack enable)"
   },
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "workspaces": [
     "packages/*"
   ],
