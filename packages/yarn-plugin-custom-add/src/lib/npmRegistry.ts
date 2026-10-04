@@ -13,28 +13,54 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { structUtils, httpUtils, type Configuration } from "@yarnpkg/core";
 
-type FetchLike = (url: string) => Promise<{ ok: boolean; status: number; json(): Promise<unknown> }>;
+export interface ResolveLatestRangeOptions {
+  packageName: string;
+  configuration: Configuration;
+}
 
 /**
- * Resolves the caret range for a package's `latest` npm dist-tag, used when a
- * `yarn add` spec omits an explicit version.
- *
- * @throws {Error} If the registry request fails or has no `latest` dist-tag.
+ * Resolves the caret range for a package's `latest` npm dist-tag.
+ * Leverages Yarn's core httpUtils to ensure enterprise auth tokens, private
+ * registry scopes, and corporate proxy configurations are automatically respected.
  */
-export async function resolveLatestRange(packageName: string, fetchImpl: FetchLike = fetch): Promise<string> {
-  const response = await fetchImpl(`https://registry.npmjs.org/${packageName}`);
+export async function resolveLatestRange(options: ResolveLatestRangeOptions): Promise<string> {
+  const { packageName, configuration } = options;
 
-  if (!response.ok) {
-    throw new Error(`Failed to resolve latest version for "${packageName}" (HTTP ${response.status}).`);
+  // Convert the string name to a formal Yarn identity descriptor
+  const ident = structUtils.parseIdent(packageName);
+
+  // Dynamically resolve the correct registry endpoint for this package scope (public vs private Artifactory)
+  const registrySpec = configuration.get("npmRegistryServer") as string;
+  const scopes = configuration.get("npmScopes") as Map<string, Map<string, unknown>>;
+
+  const targetScopeSettings = ident.scope ? scopes.get(ident.scope) : undefined;
+  const registryUrl = (targetScopeSettings?.get("npmRegistryServer") as string | undefined) ?? registrySpec;
+
+  // Standardize endpoint URLs trailing slash formats safely
+  const sanitizedRegistryUrl = registryUrl.replace(/\/$/, "");
+  const targetUrl = `${sanitizedRegistryUrl}/${structUtils.stringifyIdent(ident)}`;
+
+  try {
+    // Utilize Yarn's secure core HTTP network client
+    const response = await httpUtils.get(targetUrl, {
+      configuration,
+      jsonResponse: true,
+    });
+
+    const packument = response as { 'dist-tags'?: { latest?: string } };
+    const latest = packument['dist-tags']?.latest;
+
+    if (!latest) {
+      throw new Error(`No "latest" dist-tag found for "${packageName}" at registry ${registryUrl}.`);
+    }
+
+    return `^${latest}`;
+  } catch (error) {
+    throw new Error(
+      `Failed to resolve latest version for "${packageName}" via authenticated registry trace: ` +
+      `${error instanceof Error ? error.message : String(error)}`
+    );
   }
-
-  const packument = (await response.json()) as { 'dist-tags'?: { latest?: string } };
-  const latest = packument['dist-tags']?.latest;
-
-  if (!latest) {
-    throw new Error(`No "latest" dist-tag found for "${packageName}".`);
-  }
-
-  return `^${latest}`;
 }

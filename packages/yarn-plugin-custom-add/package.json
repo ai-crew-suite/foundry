@@ -42,10 +42,12 @@
   },
   "dependencies": {
     "@yarnpkg/core": "catalog:prod",
-    "clipanion": "catalog:prod"
+    "clipanion": "catalog:prod",
+    "npm-package-arg": "catalog:prod"
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "workspace:*",
+    "@types/npm-package-arg": "catalog:dev",
     "esbuild": "catalog:dev",
     "rollup": "catalog:dev",
     "rollup-plugin-dts": "catalog:dev",

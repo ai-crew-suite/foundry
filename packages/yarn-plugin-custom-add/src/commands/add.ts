@@ -15,28 +15,22 @@
  */
 import { BaseCommand } from "@yarnpkg/cli";
 import { Option } from "clipanion";
-import type { CommandContext, Project } from "@yarnpkg/core";
+import { Cache, StreamReport, type CommandContext, type Project } from "@yarnpkg/core";
 import { npath } from "@yarnpkg/fslib";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 
-import { upsertCatalogEntry } from "../lib/catalogFile.js";
-import { confirm } from "../lib/confirm.js";
-import { resolveLatestRange } from "../lib/npmRegistry.js";
-import { parsePackageSpec } from "../lib/parsePackageSpec.js";
-import { upsertCatalogDependency } from "../lib/packageManifest.js";
-import { resolveTargetPackageJson } from "../lib/resolveTarget.js";
+import { upsertCatalogEntry } from "../lib/catalogFile";
+import { confirm } from "../lib/confirm";
+import { resolveLatestRange } from "../lib/npmRegistry";
+import { parsePackageSpec } from "../lib/parsePackageSpec";
+import { upsertCatalogDependency } from "../lib/packageManifest";
+import { resolveTargetPackageJson } from "../lib/resolveTarget";
 
-/**
- * Structural shape of the extended execution context Yarn passes at runtime.
- */
 interface ExtendedYarnContext extends CommandContext {
   project: Project;
 }
 
-/**
- * Type guard to safely check and narrow the base context down to our runtime shape.
- */
 function isExtendedYarnContext(context: CommandContext): context is ExtendedYarnContext {
   return context !== null && typeof context === "object" && "project" in context;
 }
@@ -52,18 +46,20 @@ export class CustomAddCommand extends BaseCommand {
     description: "Target workspace/package name or relative directory path. Defaults to monorepo root.",
   });
 
+  yes = Option.Boolean("-y,--yes", false, {
+    description: "Skip confirmation prompts (assume yes)",
+  });
+
   packages = Option.Rest();
 
   override async execute(): Promise<number> {
     const rawContext = this.context;
 
-    // Type guard dynamically checks and narrows the structure without type assertions
     if (!isExtendedYarnContext(rawContext)) {
       this.context.stderr.write("❌ Error: Command is running outside of a valid Yarn environment context.\n");
       return 1;
     }
 
-    // TypeScript now safely tracks rawContext as ExtendedYarnContext
     const project = rawContext.project;
     const repoRoot = npath.fromPortablePath(project.cwd);
 
@@ -89,9 +85,12 @@ export class CustomAddCommand extends BaseCommand {
     }
 
     if (resolvedTarget.kind === "root" && this.dev) {
-      const proceed = await confirm(
-        "Add to the root package.json devDependencies? This affects every package in the monorepo.",
-      );
+      const proceed =
+        this.yes ||
+        (await confirm(
+          "Add to the root package.json devDependencies? This affects every package in the monorepo.",
+          { stdin: rawContext.stdin as any, stdout: rawContext.stdout as any },
+        ));
       if (!proceed) {
         rawContext.stdout.write("Aborted.\n");
         return 0;
@@ -103,31 +102,57 @@ export class CustomAddCommand extends BaseCommand {
     const yarnrcPath = resolve(repoRoot, ".yarnrc.yml");
 
     try {
+      // Step 1: Initialize transient configuration buffers by pulling fresh from disk
+      let currentYarnrcText = readFileSync(yarnrcPath, "utf8");
+      let currentPackageJsonText = readFileSync(resolvedTarget.packageJsonPath, "utf8");
+
+      const executionManifest: Array<{ name: string; range: string }> = [];
+
+      // Step 2: Accumulate operations and process all resolution logic completely in memory
       for (const spec of this.packages) {
         const { name, range: explicitRange } = parsePackageSpec(spec);
-        const range = explicitRange ?? (await resolveLatestRange(name));
+        const range = explicitRange ?? (await resolveLatestRange({ packageName: name, configuration: project.configuration }));
 
-        const yarnrcText = readFileSync(yarnrcPath, "utf8");
-        writeFileSync(yarnrcPath, upsertCatalogEntry(yarnrcText, catalogName, name, range), "utf8");
+        currentYarnrcText = upsertCatalogEntry(currentYarnrcText, catalogName, name, range);
+        currentPackageJsonText = upsertCatalogDependency(currentPackageJsonText, field, name, catalogName);
 
-        const packageJsonText = readFileSync(resolvedTarget.packageJsonPath, "utf8");
-        writeFileSync(
-          resolvedTarget.packageJsonPath,
-          upsertCatalogDependency(packageJsonText, field, name, catalogName),
-          "utf8",
-        );
+        executionManifest.push({ name, range });
+      }
 
+      // Step 3: Atomic Flush — Commit changes to physical assets only after absolute verification
+      writeFileSync(yarnrcPath, currentYarnrcText, "utf8");
+      writeFileSync(resolvedTarget.packageJsonPath, currentPackageJsonText, "utf8");
+
+      // Step 4: Write auditable trace logs to output context
+      for (const item of executionManifest) {
         rawContext.stdout.write(
-          `✅ Added "${name}" (${range}) to "${catalogName}" catalog -> referenced as ` +
+          `✅ Added "${item.name}" (${item.range}) to "${catalogName}" catalog -> referenced as ` +
             `"catalog:${catalogName}" in ${resolvedTarget.packageJsonPath}\n`,
         );
       }
+
+      // Automatically execute an isolated, programmatic 'yarn install' mutation
+      rawContext.stdout.write("\n🔄 Applying mutations via integrated workspace install...\n");
+
+      const cache = await Cache.find(project.configuration);
+      const report = await StreamReport.start({
+        configuration: project.configuration,
+        stdout: rawContext.stdout,
+        includeLogs: true,
+      }, async (reportInstance) => {
+        await project.install({ cache, report: reportInstance });
+      });
+
+      if (report.hasErrors()) {
+        return 1;
+      }
+
     } catch (error) {
       rawContext.stderr.write(`❌ ${error instanceof Error ? error.message : String(error)}\n`);
       return 1;
     }
 
-    rawContext.stdout.write('\nRun "yarn install" to apply the changes.\n');
+    rawContext.stdout.write('🎉 Workspace configurations synchronized successfully.\n');
     return 0;
   }
 }

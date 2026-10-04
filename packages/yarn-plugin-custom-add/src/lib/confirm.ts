@@ -14,14 +14,31 @@
  * limitations under the License.
  */
 import { createInterface } from 'node:readline/promises';
+import type { Readable, Writable } from 'node:stream';
 
-/** Prompts for a y/N confirmation. Non-interactive terminals default to "no". */
-export async function confirm(question: string): Promise<boolean> {
-  if (!process.stdin.isTTY) {
+export interface ConfirmOptions {
+  stdin?: Readable & { isTTY?: boolean };
+  stdout?: Writable;
+}
+
+/**
+ * Prompts for a y/N confirmation.
+ * Automatically defaults to false in non-interactive / non-TTY environments.
+ */
+export async function confirm(
+  question: string,
+  options: ConfirmOptions = {},
+): Promise<boolean> {
+  const stdin = options.stdin ?? process.stdin;
+  const stdout = options.stdout ?? process.stdout;
+
+  // In non-interactive environments (CI, redirected pipe), fail safe by returning false
+  if (!stdin.isTTY) {
     return false;
   }
 
-  const rl = createInterface({ input: process.stdin, output: process.stdout });
+  const rl = createInterface({ input: stdin, output: stdout });
+
   try {
     const answer = await rl.question(`${question} (y/N): `);
     return /^y(es)?$/i.test(answer.trim());

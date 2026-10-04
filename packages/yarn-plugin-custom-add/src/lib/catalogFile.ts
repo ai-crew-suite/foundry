@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-// packages/yarn-plugin-custom-add/src/lib/catalogFile.ts
-
 const CATALOGS_ROOT_LINE = 'catalogs:';
 const CATALOG_HEADER_INDENT = '  ';
 const CATALOG_ENTRY_INDENT = '    ';
@@ -109,7 +106,7 @@ export function upsertCatalogEntry(
   packageName: string,
   range: string,
 ): string {
-  const lines = yarnrcText.split('\n');
+  const lines = yarnrcText.length === 0 ? [] : yarnrcText.split('\n');
   const newEntryLine = `${CATALOG_ENTRY_INDENT}"${packageName}": "${range}"`;
   const catalogsIndex = lines.findIndex((line) => line === CATALOGS_ROOT_LINE);
 
