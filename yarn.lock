@@ -138,6 +138,7 @@ __metadata:
     rollup-plugin-esbuild: "catalog:dev"
     tslib: "catalog:dev"
     typescript: "catalog:dev"
+    vitest: "catalog:dev"
   languageName: unknown
   linkType: soft
 
