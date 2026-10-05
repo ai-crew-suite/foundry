@@ -9,6 +9,18 @@
     "POSTGRES_PASSWORD"
   ],
   "tasks": {
+    // Global root-level task
+    "//#format:turbo": {
+      "cache": false,
+      "inputs": ["turbo.jsonc", "packages/**/turbo.jsonc"],
+      "outputs": []
+    },
+    "//#lint:turbo": {
+      "cache": false,
+      "inputs": ["turbo.jsonc", "packages/**/turbo.jsonc"],
+      "outputs": []
+    },
+    // Package tasks
     "build": {
       "cache": true,
       "dependsOn": ["^build"],
