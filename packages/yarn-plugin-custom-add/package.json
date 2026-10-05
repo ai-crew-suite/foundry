@@ -35,9 +35,9 @@
     "build": "npm run clean && rollup -c rollup.config.ts --configPlugin esbuild",
     "clean": "crew clean",
     "lint": "crew lint",
-    "test": "yarn test:unit",
-    "test:unit": "crew test:unit",
-    "test:unit:coverage": "crew test:unit:coverage",
+    "test": "yarn test:unit && yarn test:integration",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "test:integration": "vitest run --config vitest.integration.config.ts",
     "typecheck": "crew typecheck"
   },
   "dependencies": {
@@ -47,8 +47,11 @@
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "workspace:*",
+    "@rollup/plugin-commonjs": "catalog:dev",
+    "@rollup/plugin-json": "catalog:dev",
     "@types/npm-package-arg": "catalog:dev",
     "esbuild": "catalog:dev",
+    "execa": "catalog:dev",
     "rollup": "catalog:dev",
     "rollup-plugin-dts": "catalog:dev",
     "rollup-plugin-esbuild": "catalog:dev",

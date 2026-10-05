@@ -49,6 +49,12 @@ vi.mock('@yarnpkg/core', async (importOriginal) => {
     Cache: {
       find: vi.fn().mockResolvedValue({}),
     },
+    Project: {
+      find: vi.fn(),
+    },
+    Configuration: {
+      find: vi.fn(),
+    },
     StreamReport: {
       start: vi.fn().mockImplementation(async (opts, cb) => {
         const mockReport = { hasErrors: vi.fn().mockReturnValue(false) };
@@ -59,7 +65,7 @@ vi.mock('@yarnpkg/core', async (importOriginal) => {
   };
 });
 
-import { Cache, StreamReport } from '@yarnpkg/core';
+import { Cache, Configuration, Project, StreamReport } from '@yarnpkg/core';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { confirm } from '../../lib/confirm';
 import { resolveLatestRange } from '../../lib/npmRegistry';
@@ -87,6 +93,7 @@ describe('CustomAddCommand', () => {
     };
 
     mockContext = {
+      cwd: '/mock/repo/root',
       stdin: new PassThrough(),
       stdout: new PassThrough(),
       stderr: new PassThrough(),
@@ -99,6 +106,13 @@ describe('CustomAddCommand', () => {
 
     mockContext.stdout.write = vi.fn();
     mockContext.stderr.write = vi.fn();
+
+    // The command reloads the project after flushing manifests; keep returning the mock
+    vi.mocked(Project.find).mockResolvedValue({ project: mockContext.project } as any);
+    vi.mocked(Configuration.find).mockImplementation(async (cwd: any) => {
+      if (!cwd) throw new Error('No Yarn project found from the provided cwd');
+      return mockConfiguration;
+    });
   });
 
   it('fails safely when executed outside of an active Yarn environment context', async () => {
@@ -132,6 +146,8 @@ describe('CustomAddCommand', () => {
       kind: 'root',
       packageJsonPath: '/mock/repo/root/package.json',
     });
+    // Simulate a monorepo root so the confirmation guardrail engages
+    vi.mocked(readFileSync).mockReturnValue('{"workspaces": ["packages/*"]}');
     vi.mocked(confirm).mockResolvedValue(false);
 
     const exitCode = await command.execute();
@@ -152,7 +168,8 @@ describe('CustomAddCommand', () => {
       packageJsonPath: '/mock/repo/root/package.json',
     });
     vi.mocked(parsePackageSpec).mockReturnValue({ name: 'lodash', range: '^4.17.21' });
-    vi.mocked(readFileSync).mockReturnValue('{}');
+    // Simulate a monorepo root so the confirmation guardrail engages
+    vi.mocked(readFileSync).mockReturnValue('{"workspaces": ["packages/*"]}');
 
     const exitCode = await command.execute();
     expect(exitCode).toBe(0);

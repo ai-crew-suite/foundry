@@ -15,7 +15,7 @@
  */
 import { BaseCommand } from "@yarnpkg/cli";
 import { Option } from "clipanion";
-import { Cache, StreamReport, type CommandContext, type Project } from "@yarnpkg/core";
+import { Cache, Configuration, Project, StreamReport, type CommandContext } from "@yarnpkg/core";
 import { npath } from "@yarnpkg/fslib";
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
@@ -36,7 +36,7 @@ function isExtendedYarnContext(context: CommandContext): context is ExtendedYarn
 }
 
 export class CustomAddCommand extends BaseCommand {
-  static override paths = [["add"]];
+  static override paths = [["catalog-add"]];
 
   dev = Option.Boolean("-D,--dev", false, {
     description: "Add the package as a devDependency in the dev catalog",
@@ -55,12 +55,25 @@ export class CustomAddCommand extends BaseCommand {
   override async execute(): Promise<number> {
     const rawContext = this.context;
 
-    if (!isExtendedYarnContext(rawContext)) {
-      this.context.stderr.write("❌ Error: Command is running outside of a valid Yarn environment context.\n");
-      return 1;
+    // Yarn's real command context does not carry a `project`; commands are
+    // expected to locate it themselves. The injected context path is kept so
+    // unit tests can supply a lightweight project mock directly.
+    let project: Project;
+    if (isExtendedYarnContext(rawContext)) {
+      project = rawContext.project;
+    } else {
+      try {
+        const configuration = await Configuration.find(rawContext.cwd, rawContext.plugins);
+        ({ project } = await Project.find(configuration, rawContext.cwd));
+      } catch (error) {
+        rawContext.stderr.write(
+          `❌ Error: Command is running outside of a valid Yarn environment context. ` +
+            `${error instanceof Error ? error.message : String(error)}\n`,
+        );
+        return 1;
+      }
     }
 
-    const project = rawContext.project;
     const repoRoot = npath.fromPortablePath(project.cwd);
 
     if (this.packages.length === 0) {
@@ -76,7 +89,19 @@ export class CustomAddCommand extends BaseCommand {
       return 1;
     }
 
-    if (resolvedTarget.kind === "root" && !this.dev) {
+    // The monorepo-specific guardrails (prod-rejection guard and the root dev
+    // confirmation prompt) only apply when the root manifest actually declares
+    // workspaces. For a plain single-package repository the root manifest IS the
+    // application, so targeting it directly is the expected behavior.
+    let isMonorepoRoot = false;
+    if (resolvedTarget.kind === "root") {
+      const rootManifest = JSON.parse(readFileSync(resolvedTarget.packageJsonPath, "utf8")) as {
+        workspaces?: unknown;
+      };
+      isMonorepoRoot = Boolean(rootManifest.workspaces);
+    }
+
+    if (isMonorepoRoot && !this.dev) {
       rawContext.stderr.write(
         '❌ The root package.json only declares devDependencies. Pass "-D" or "--dev" to add a root ' +
           'devDependency, or "--target <package>" to target a workspace.\n',
@@ -84,7 +109,7 @@ export class CustomAddCommand extends BaseCommand {
       return 1;
     }
 
-    if (resolvedTarget.kind === "root" && this.dev) {
+    if (isMonorepoRoot && this.dev) {
       const proceed =
         this.yes ||
         (await confirm(
@@ -133,6 +158,14 @@ export class CustomAddCommand extends BaseCommand {
 
       // Automatically execute an isolated, programmatic 'yarn install' mutation
       rawContext.stdout.write("\n🔄 Applying mutations via integrated workspace install...\n");
+
+      // The currently loaded project and configuration were parsed before our
+      // flush: the stale in-memory manifest would overwrite the mutated
+      // package.json during install persistence, and the stale configuration
+      // wouldn't know about the freshly written catalog entries (YN0082).
+      // Reload both so the new catalog references survive and resolve.
+      const freshConfiguration = await Configuration.find(rawContext.cwd, rawContext.plugins);
+      ({ project } = await Project.find(freshConfiguration, rawContext.cwd));
 
       const cache = await Cache.find(project.configuration);
       const report = await StreamReport.start({

@@ -4,9 +4,17 @@
   "tasks": {
     "build": {
       "cache": true,
+      // Overrides root to remove upstream package dependencies while retaining environment safety markers
       "dependsOn": [],
       "inputs": ["src/**", "package.json"],
       "outputs": ["dist/**"]
+    },
+    "test:integration": {
+      "cache": false, // Integration tests write volatile global OS temporary dirs; never cache them
+      // Force a clean localized production compilation run before spawning E2E processes
+      "dependsOn": ["build"],
+      "inputs": ["src/__tests__/**/*.integration.test.ts"],
+      "outputs": []
     }
   }
 }
