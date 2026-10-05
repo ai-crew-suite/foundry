@@ -39,17 +39,18 @@ The CLI uses a smart tree-climbing utility (`getWorkspaceContext()`) that reads 
 
 The tool maps the active workspace's roles into clear semantic runtime boundaries on the fly. This prevents developers from having to configure boilerplate environment scripts:
 
-* **`isBrowser` Core Targets:** Mapped automatically for `frontend`, `frontend-plugin`, `frontend-plugin-module`, and `web-library`. Automatically sets Vitest to boot in a **JSDOM** sandbox and pulls down browser-specific lint rulesets.
-* **`isServer` Core Targets:** Mapped automatically for `backend`, `backend-plugin`, `backend-plugin-module`, `node-library`, `cli`, and `cli-module`. Sets Vitest to a native, high-speed **Node** execution loop and enables server-side runtime validations.
+- **`isBrowser` Core Targets:** Mapped automatically for `frontend`, `frontend-plugin`, `frontend-plugin-module`, and `web-library`. Automatically sets Vitest to boot in a **JSDOM** sandbox and pulls down browser-specific lint rulesets.
+- **`isServer` Core Targets:** Mapped automatically for `backend`, `backend-plugin`, `backend-plugin-module`, `node-library`, `cli`, and `cli-module`. Sets Vitest to a native, high-speed **Node** execution loop and enables server-side runtime validations.
 
 ### 🛡️ Resilient Process & Type Architecture
 
 The toolbelt architecture is constructed following modern, deterministic execution patterns:
-* **Decoupled Entrypoints:** `index.ts` files act strictly as lightweight declarative shells. All business rules, process spawning pipelines, and validation steps reside in pure, decoupled modules (`lib/orchestrate.ts` or `lib/sync.ts`).
-* **Safe Exit Code Trapping:** The codebase enforces a strict **no-process-exit** layout policy. Subprocesses mutate `process.exitCode` natively and return control back to the event loop gracefully. This allows streams to finish draining and avoids abruptly halting asynchronous execution queues.
-* **Deterministic Execution & Fail-safes:** If a child process is forcefully killed or timed out by a CI agent (yielding a `null` exit status), the orchestrator intercepts the signal and forces an exit status of `1` instead of leaking a false zero success code.
-* **Extension-Free Resolution:** Clean TypeScript module boundaries are maintained throughout. Suffix paths like `.js` inside source file imports have been completely eliminated.
-* **Backstage Ecosystem Shimming:** To support testing suites relying on upstream Backstage utility libraries (which look for native Jest testing hooks), the `test-unit` engine automatically mounts a global compatibility layer mapping `globalThis.jest` hooks directly to highly performant native Vitest vectors (`vi.fn()` and `vi.spyOn()`).
+
+- **Decoupled Entrypoints:** `index.ts` files act strictly as lightweight declarative shells. All business rules, process spawning pipelines, and validation steps reside in pure, decoupled modules (`lib/orchestrate.ts` or `lib/sync.ts`).
+- **Safe Exit Code Trapping:** The codebase enforces a strict **no-process-exit** layout policy. Subprocesses mutate `process.exitCode` natively and return control back to the event loop gracefully. This allows streams to finish draining and avoids abruptly halting asynchronous execution queues.
+- **Deterministic Execution & Fail-safes:** If a child process is forcefully killed or timed out by a CI agent (yielding a `null` exit status), the orchestrator intercepts the signal and forces an exit status of `1` instead of leaking a false zero success code.
+- **Extension-Free Resolution:** Clean TypeScript module boundaries are maintained throughout. Suffix paths like `.js` inside source file imports have been completely eliminated.
+- **Backstage Ecosystem Shimming:** To support testing suites relying on upstream Backstage utility libraries (which look for native Jest testing hooks), the `test-unit` engine automatically mounts a global compatibility layer mapping `globalThis.jest` hooks directly to highly performant native Vitest vectors (`vi.fn()` and `vi.spyOn()`).
 
 ## 🛠️ The Global Command Matrix
 
@@ -62,19 +63,19 @@ crew test:unit --update
 crew lint --fix
 ```
 
-| Sub-command | Purpose | Cache Policy |
-| --- | --- | --- |
-| **`crew clean`** | Clears local caching matrices and `dist/` folders safely with root guards. | Cache Bypass |
-| **`crew build`** | Wraps backstage-cli package compilation rules. | Cacheable (`dist/**`) |
-| **`crew format`** | Run automated text style formatting across the workspace layout via Prettier. | Cacheable |
-| **`crew lint`** | Performs zero-config ESLint Flat rules evaluations. | Cacheable |
-| **`crew typecheck`** | Forces local `tsc --noEmit` compiler checks. | Cacheable |
-| **`crew sync:refs`** | Synchronizes TypeScript Project References alphabetically and heals roots. | Cache Bypass |
-| **`crew test:unit`** | Fast, local, in-memory unit test matrix runner via Vitest. | Cacheable |
-| **`crew test:unit:coverage`** | Comprehensive V8 block-coverage metric collection run. | Cacheable (`coverage/**`) |
-| **`crew test:e2e`** | Enterprise Playwright integration test suite browser pipeline. | Cacheable |
-| **`crew storybook`** | Launches a self-contained Vite development documentation hub. | Live Watch |
-| **`crew storybook:build`** | Bundles static distribution UI document artifacts. | Cacheable |
+| Sub-command                   | Purpose                                                                       | Cache Policy              |
+| ----------------------------- | ----------------------------------------------------------------------------- | ------------------------- |
+| **`crew clean`**              | Clears local caching matrices and `dist/` folders safely with root guards.    | Cache Bypass              |
+| **`crew build`**              | Wraps backstage-cli package compilation rules.                                | Cacheable (`dist/**`)     |
+| **`crew format`**             | Run automated text style formatting across the workspace layout via Prettier. | Cacheable                 |
+| **`crew lint`**               | Performs zero-config ESLint Flat rules evaluations.                           | Cacheable                 |
+| **`crew typecheck`**          | Forces local `tsc --noEmit` compiler checks.                                  | Cacheable                 |
+| **`crew sync:refs`**          | Synchronizes TypeScript Project References alphabetically and heals roots.    | Cache Bypass              |
+| **`crew test:unit`**          | Fast, local, in-memory unit test matrix runner via Vitest.                    | Cacheable                 |
+| **`crew test:unit:coverage`** | Comprehensive V8 block-coverage metric collection run.                        | Cacheable (`coverage/**`) |
+| **`crew test:e2e`**           | Enterprise Playwright integration test suite browser pipeline.                | Cacheable                 |
+| **`crew storybook`**          | Launches a self-contained Vite development documentation hub.                 | Live Watch                |
+| **`crew storybook:build`**    | Bundles static distribution UI document artifacts.                            | Cacheable                 |
 
 ## 💻 Local CLI Development Workflow
 

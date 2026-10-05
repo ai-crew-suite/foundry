@@ -1,7 +1,7 @@
 {
   "name": "@ai-crew-suite/canonical-repo-assets",
   "description": "Centralized repository assets for the AI Crew Suite platform.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Apache-2.0",
   "keywords": [
     "ai-crew-suite",
@@ -11,7 +11,10 @@
     "node": "22 || 24"
   },
   "packageManager": "yarn@4.18.0",
-  "private": true,
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "http://localhost:invalid-registry-override-trap"
+  },
   "bugs": {
     "url": "https://github.com/ai-crew-suite/foundry/issues",
     "email": "support@ai-crew-suite.dev"

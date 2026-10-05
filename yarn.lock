@@ -12,6 +12,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ai-crew-suite/backstage-config-typegen@workspace:packages/backstage-config-typegen":
+  version: 0.0.0-use.local
+  resolution: "@ai-crew-suite/backstage-config-typegen@workspace:packages/backstage-config-typegen"
+  dependencies:
+    "@types/node": "catalog:dev"
+    esbuild: "catalog:dev"
+    rollup: "catalog:dev"
+    rollup-plugin-dts: "catalog:dev"
+    rollup-plugin-esbuild: "catalog:dev"
+    typescript: "catalog:prod"
+    vitest: "catalog:prod"
+  bin:
+    backstage-config-typegen: ./dist/bin/sync-config.js
+  languageName: unknown
+  linkType: soft
+
 "@ai-crew-suite/canonical-repo-assets@workspace:packages/canonical-repo-assets":
   version: 0.0.0-use.local
   resolution: "@ai-crew-suite/canonical-repo-assets@workspace:packages/canonical-repo-assets"
@@ -148,22 +164,6 @@ __metadata:
     tslib: "catalog:dev"
     typescript: "catalog:dev"
     vitest: "catalog:dev"
-  languageName: unknown
-  linkType: soft
-
-"@ai-crew-suite/yarn-plugin-custom-sync-config-types@workspace:packages/backstage-config-typegen":
-  version: 0.0.0-use.local
-  resolution: "@ai-crew-suite/yarn-plugin-custom-sync-config-types@workspace:packages/backstage-config-typegen"
-  dependencies:
-    "@types/node": "catalog:dev"
-    esbuild: "catalog:dev"
-    rollup: "catalog:dev"
-    rollup-plugin-dts: "catalog:dev"
-    rollup-plugin-esbuild: "catalog:dev"
-    typescript: "catalog:prod"
-    vitest: "catalog:prod"
-  bin:
-    sync-config-types: ./dist/bin.js
   languageName: unknown
   linkType: soft
 

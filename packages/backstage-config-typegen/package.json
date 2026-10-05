@@ -1,7 +1,7 @@
 {
-  "name": "@ai-crew-suite/yarn-plugin-custom-sync-config-types",
+  "name": "@ai-crew-suite/backstage-config-typegen",
   "description": "CLI that synchronizes Backstage config.d.ts schema types into a plugin's runtime source tree",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "license": "Apache-2.0",
   "keywords": [
@@ -11,9 +11,9 @@
     "config"
   ],
   "engines": {
-    "node": "22 || 24"
+    "node": ">=22.0.0"
   },
-  "packageManager": "yarn@4.18.0",
+  "packageManager": "yarn@4.18.1",
   "publishConfig": {
     "access": "public",
     "provenance": true
@@ -25,19 +25,19 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/ai-crew-suite/foundry",
-    "directory": "packages/yarn-plugin-custom-sync-config-types"
+    "directory": "packages/backstage-config-typegen"
   },
-  "main": "./dist/sync.js",
-  "types": "./dist/sync.d.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "bin": {
-    "sync-config-types": "./dist/bin.js"
+    "backstage-config-typegen": "./dist/bin/sync-config.js"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "clean": "crew clean",
-    "build": "npm run clean && rollup -c rollup.config.ts --configPlugin esbuild",
+    "build": "yarn clean && rollup -c rollup.config.ts --configPlugin esbuild",
     "lint": "crew lint",
     "test:unit": "crew test:unit",
     "test:unit:coverage": "crew test:unit:coverage",
@@ -47,6 +47,7 @@
     "typescript": "catalog:prod"
   },
   "devDependencies": {
+    "@ai-crew-suite/crew-cli": "workspace:*",
     "@types/node": "catalog:dev",
     "esbuild": "catalog:dev",
     "rollup": "catalog:dev",

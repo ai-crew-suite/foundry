@@ -20,6 +20,7 @@
     "lint": "turbo lint",
     "lint:changed": "turbo lint --filter=[HEAD~1]",
     "lint:turbo": "node node_modules/@turbo/codemod/dist/cli.js migrate . --dry --print",
+    "release": "turbo run publish",
     "sync": "crew sync:refs",
     "test": "yarn test:unit && yarn test:e2e && yarn test:unit:coverage",
     "test:unit": "turbo run test:unit",
@@ -61,7 +62,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,mjs,cjs}": [
-      "eslint --config packages/config-eslint/eslint.monorepo.config.ts --fix"
+      "eslint --fix"
     ],
     "*.{json,md,css,scss}": [
       "prettier --write"

@@ -1,7 +1,7 @@
 {
   "name": "@ai-crew-suite/renovate-shared-config",
   "description": "Centralized, high-compliance Renovate dependency presets for the AI Crew Suite platform.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Apache-2.0",
   "keywords": [
     "ai-crew-suite",
@@ -26,9 +26,9 @@
     "access": "public",
     "provenance": true
   },
-  "main": "default.json",
+  "main": "dist/default.json",
   "files": [
-    "default.json",
+    "dist",
     "README.md"
   ],
   "scripts": {
@@ -44,6 +44,6 @@
     "shx": "catalog:dev"
   },
   "renovate-config": {
-    "default": "./default.json"
+    "default": "./dist/default.json"
   }
 }

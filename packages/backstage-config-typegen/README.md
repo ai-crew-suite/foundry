@@ -61,6 +61,21 @@ syncConfigTypes({
 });
 ```
 
+## Turborepo Orchestration Layout (`turbo.jsonc`)
+
+To let Turborepo manage your caching correctly, register the task explicitly inside your root `turbo.jsonc` task runner graph:
+
+```json
+    /** Synchronizes Backstage plugin config.d.ts down to inner generated type files */
+    "sync:config": {
+      "cache": true,
+      // Execution depends on typescript declarations and local source file states
+      "dependsOn": ["^build"],
+      "inputs": ["config.d.ts"],
+      "outputs": ["src/types/config.generated.ts"]
+    }
+```
+
 ## Compliance and Licensing
 
 Copyright © 2026 The AI Crew Suite Authors.

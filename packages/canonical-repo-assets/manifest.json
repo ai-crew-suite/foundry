@@ -278,6 +278,22 @@
           "dest": ".vscode/extensions.json"
         }
       ]
+    },
+    {
+      "name": "Yarn Plugin Scrips",
+      "repos": [
+        "ai-crew-suite/agents",
+        "ai-crew-suite/drivers",
+        "ai-crew-suite/foundry",
+        "ai-crew-suite/platform",
+        "ai-crew-suite/workbench"
+      ],
+      "files": [
+        {
+          "source": "templates/yarn/settings.json",
+          "dest": ".yarn/plugins/@yarnpkg/plugin-backstage.cjs"
+        }
+      ]
     }
   ]
 }

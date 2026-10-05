@@ -18,43 +18,37 @@ import esbuild from "rollup-plugin-esbuild";
 import dts from "rollup-plugin-dts";
 
 const config: RollupOptions[] = [
-  // 1. Build the JavaScript/ESM bundles
+  // Compile the main programmatic library module
   {
-    input: {
-      sync: "src/sync.ts",
-      bin: "src/bin.ts"
-    },
+    input: "src/sync.ts",
     output: {
-      dir: "dist",
-      format: "es",
-      sourcemap: false,
-      entryFileNames: "[name].js",
-      /** Inject a shebang only into the executable CLI entry. */
-      banner: (chunk) => (chunk.name === "bin" ? "#!/usr/bin/env node\n" : "")
+      file: "dist/index.js",
+      format: "esm",
+      sourcemap: false
     },
-    plugins: [
-      esbuild({
-        tsconfig: "./tsconfig.json"
-      })
-    ],
+    plugins: [esbuild()],
     external: (id) => id === "typescript" || id.startsWith("node:")
   },
-  // 2. Build and bundle the type declarations (.d.ts) for both entries
+  // Compile the executable CLI binary runner wrapper
   {
-    input: {
-      sync: "src/sync.ts",
-      bin: "src/bin.ts"
-    },
+    input: "src/bin/sync-config.ts",
     output: {
-      dir: "dist",
-      format: "es",
-      entryFileNames: "[name].d.ts"
+      file: "dist/bin/sync-config.js",
+      format: "esm",
+      banner: "#!/usr/bin/env node", // Injects the executable node interpreter shebang
+      sourcemap: false
     },
-    plugins: [
-      dts({
-        tsconfig: "./tsconfig.json"
-      })
-    ],
+    plugins: [esbuild()],
+    external: (id) => id === "typescript" || id.startsWith("node:") || id.endsWith("../sync")
+  },
+  // Compile type declarations
+  {
+    input: "src/sync.ts",
+    output: {
+      file: "dist/index.d.ts",
+      format: "es"
+    },
+    plugins: [dts()],
     external: (id) => id === "typescript" || id.startsWith("node:")
   }
 ];

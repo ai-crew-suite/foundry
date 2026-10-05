@@ -1,10 +1,9 @@
 {
   "extends": "./tsconfig.base.json",
   "files": [],
-  "include": [
-    "packages/**/*"
-  ],
+  "include": ["packages/**/*"],
   "references": [
+    { "path": "./packages/backstage-config-typegen" },
     { "path": "./packages/canonical-repo-assets" },
     { "path": "./packages/crew-cli" },
     { "path": "./packages/renovate-shared-config" },

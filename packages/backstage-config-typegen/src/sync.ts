@@ -13,111 +13,115 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname } from 'node:path';
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { dirname } from "node:path";
 import {
   createSourceFile,
-  forEachChild,
-  isIdentifier,
-  isInterfaceDeclaration,
-  isPropertySignature,
   ScriptTarget,
-  type Node,
+  SyntaxKind,
   type SourceFile,
-  type TypeNode,
-} from 'typescript';
+  type InterfaceDeclaration,
+  type PropertySignature,
+  type Identifier,
+} from "typescript";
 
-/** Options controlling how {@link syncConfigTypes} reads and writes config types. */
 export interface SyncConfigTypesOptions {
-  /** Absolute path to the `config.d.ts` file declaring the `Config` interface. */
   configDtsPath: string;
-  /** Absolute path of the generated TypeScript file to write. */
   targetTypesPath: string;
-  /** Property on the `Config` interface to extract. Defaults to `'ai'`. */
   propertyName?: string;
-  /** Name of the generated exported type. Defaults to `'AiBackendConfig'`. */
   exportedTypeName?: string;
 }
 
-const DEFAULT_PROPERTY_NAME = 'ai';
-const DEFAULT_EXPORTED_TYPE_NAME = 'AiBackendConfig';
-
 /**
- * Walks a parsed `config.d.ts` AST for the top-level `Config` interface and
- * returns the raw source text of the `propertyName` member's type, if found.
+ * Extracts a specific top-level property type from a 'Config' interface within a TypeScript AST.
  */
 export function extractConfigPropertyType(
   sourceFile: SourceFile,
-  sourceCode: string,
+  sourceText: string,
   propertyName: string,
 ): string | undefined {
-  let propertyType: TypeNode | undefined;
+  let configInterface: InterfaceDeclaration | undefined;
 
-  function visit(node: Node): void {
-    if (isInterfaceDeclaration(node) && node.name.text === 'Config') {
-      const property = node.members.find(
-        (member) =>
-          isPropertySignature(member) &&
-          isIdentifier(member.name) &&
-          member.name.text === propertyName,
-      );
-
-      if (property && isPropertySignature(property) && property.type) {
-        propertyType = property.type;
-      }
+  // Walk the top-level statements to locate the explicit "Config" interface block
+  for (const statement of sourceFile.statements) {
+    if (
+      statement.kind === SyntaxKind.InterfaceDeclaration &&
+      (statement as InterfaceDeclaration).name.text === "Config"
+    ) {
+      configInterface = statement as InterfaceDeclaration;
+      break;
     }
-
-    forEachChild(node, visit);
   }
 
-  visit(sourceFile);
+  if (!configInterface) {
+    return undefined;
+  }
 
-  return propertyType
-    ? sourceCode.substring(propertyType.getStart(sourceFile), propertyType.getEnd())
-    : undefined;
-}
+  // Iterate over members to isolate the requested property name matching target criteria
+  for (const member of configInterface.members) {
+    if (
+      member.kind === SyntaxKind.PropertySignature &&
+      (member as PropertySignature).name.kind === SyntaxKind.Identifier
+    ) {
+      const prop = member as PropertySignature;
+      // HARDENING: Explicitly cast the property name to an Identifier to clear strict null and property checks
+      const propNameIdentifier = prop.name as Identifier;
 
-/** Renders the machine-generated runtime types file content. */
-export function buildGeneratedFileContents(propertyTypeText: string, exportedTypeName: string): string {
-  return `/**
- * MACHINE GENERATED DO NOT MODIFY DIRECTLY
- *
- * This file was automatically generated from config.d.ts.
- * Run \`yarn sync-config-types\` to update this file.
- *
- * The two declarations intentionally duplicate the same shape: config.d.ts
- * must stay self-contained for published config-schema loading, while src
- * code must not reference it so the emitted dist-types tree remains
- * resolvable by the declaration bundler.
- */
+      if (propNameIdentifier.text === propertyName) {
+        if (!prop.type) return undefined;
 
-export type ${exportedTypeName} = ${propertyTypeText};
-`;
+        // Capture the verbatim source code bounds of the target property's type literal block
+        return sourceText.slice(prop.type.pos, prop.type.end).trim();
+      }
+    }
+  }
+
+  return undefined;
 }
 
 /**
- * Synchronizes a single `Config` interface property from `config.d.ts` into a
- * standalone, machine-generated TypeScript file.
- *
- * @throws {Error} If `propertyName` is not declared on the `Config` interface.
+ * Renders a standard machine-generated enterprise code asset wrapper.
+ */
+export function buildGeneratedFileContents(propertyTypeSource: string, exportedTypeName: string): string {
+  return [
+    "/**",
+    " * ⚠️ MACHINE GENERATED DO NOT MODIFY DIRECTLY",
+    " * This file was synchronized automatically via internal monorepo workflow configurations.",
+    " */",
+    "",
+    `export type ${exportedTypeName} = ${propertyTypeSource};`,
+    "",
+  ].join("\n");
+}
+
+/**
+ * Synchronizes 'config.d.ts' schema definitions into localized plugin type modules.
  */
 export function syncConfigTypes(options: SyncConfigTypesOptions): void {
-  const propertyName = options.propertyName ?? DEFAULT_PROPERTY_NAME;
-  const exportedTypeName = options.exportedTypeName ?? DEFAULT_EXPORTED_TYPE_NAME;
+  const {
+    configDtsPath,
+    targetTypesPath,
+    propertyName = "ai",
+    exportedTypeName = "AiBackendConfig",
+  } = options;
 
-  const sourceCode = readFileSync(options.configDtsPath, 'utf8');
-  const sourceFile = createSourceFile(options.configDtsPath, sourceCode, ScriptTarget.Latest, true);
-  const propertyTypeText = extractConfigPropertyType(sourceFile, sourceCode, propertyName);
+  const sourceCode = readFileSync(configDtsPath, "utf8");
+  const sourceFile = createSourceFile(configDtsPath, sourceCode, ScriptTarget.Latest, true);
 
-  if (!propertyTypeText) {
+  const extractedType = extractConfigPropertyType(sourceFile, sourceCode, propertyName);
+
+  if (!extractedType) {
     throw new Error(
-      `Could not find "${propertyName}" inside the Config interface in ${options.configDtsPath}`,
+      `Could not find "${propertyName}" configuration block declaration criteria inside the target ` +
+      `"Config" interface of ${configDtsPath}. Please review schema alignments.`
     );
   }
 
-  const generatedContent = buildGeneratedFileContents(propertyTypeText, exportedTypeName);
+  const generatedContents = buildGeneratedFileContents(extractedType, exportedTypeName);
 
-  mkdirSync(dirname(options.targetTypesPath), { recursive: true });
-  writeFileSync(options.targetTypesPath, generatedContent, 'utf8');
+  // Enforce recursive directory initialization to safeguard deep nesting flakiness
+  const targetDir = dirname(targetTypesPath);
+  mkdirSync(targetDir, { recursive: true });
+
+  writeFileSync(targetTypesPath, generatedContents, "utf8");
 }
-

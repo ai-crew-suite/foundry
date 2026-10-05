@@ -28,112 +28,76 @@ interface TsConfigShape {
 }
 
 function mergeConfigs(targetPath: string, outputPath: string): void {
-  const targetFilename = path.basename(targetPath);
-
   try {
-    // 1. Guard: Validate Target File Existence
     if (!fs.existsSync(targetPath)) {
-      throw new Error(
-        `Failed to resolve target configuration file "${targetFilename}".\n` +
-        `   Checked Path:  ${path.resolve(targetPath)}\n` +
-        `   Remediation:   Verify the file exists and that the build script argument matches the file location.`
-      );
+      throw new Error(`Failed to resolve target file: ${path.resolve(targetPath)}`);
     }
 
-    // 2. Guard: Validate Target File JSON Syntax
-    let target: TsConfigShape;
-    try {
-      target = JSON.parse(fs.readFileSync(targetPath, 'utf8')) as TsConfigShape;
-    } catch (parseError: any) {
-      throw new Error(
-        `Malformed JSON syntax detected inside "${targetFilename}".\n` +
-        `   Internal Error: ${parseError.message}\n` +
-        `   Remediation:    Run 'yarn format' or fix syntax anomalies like missing brackets or trailing commas.`
-      );
-    }
-
+    const target = JSON.parse(fs.readFileSync(targetPath, 'utf8')) as TsConfigShape;
     let merged: TsConfigShape = {};
 
     if (target.extends) {
       const basePath = path.resolve(path.dirname(targetPath), target.extends);
 
-      // 3. Guard: Validate Inherited 'extends' File Existence
       if (!fs.existsSync(basePath)) {
-        throw new Error(
-          `Broken inheritance chain detected inside "${targetFilename}".\n` +
-          `   Declared:     "extends": "${target.extends}"\n` +
-          `   Unresolved:   ${basePath}\n` +
-          `   Remediation:  Verify the path is accurate relative to the folder containing "${targetFilename}".`
-        );
+        throw new Error(`Broken inheritance chain. Unresolved base: ${basePath}`);
       }
 
-      // 4. Guard: Validate Base File JSON Syntax
-      let base: TsConfigShape;
-      try {
-        base = JSON.parse(fs.readFileSync(basePath, 'utf8')) as TsConfigShape;
-      } catch (parseError: any) {
-        throw new Error(
-          `Malformed JSON syntax detected inside base configuration "${path.basename(basePath)}" (inherited by "${targetFilename}").\n` +
-          `   Internal Error: ${parseError.message}\n` +
-          `   Remediation:    Fix syntax anomalies inside the base configuration file.`
-        );
-      }
+      const base = JSON.parse(fs.readFileSync(basePath, 'utf8')) as TsConfigShape;
 
-      // Spread top-level keys from base config
+      // 1. Core values spread
       merged = { ...base };
 
-      // Deep merge compilerOptions to allow specific downstream overrides
-      if (target.compilerOptions) {
-        merged.compilerOptions = { ...base.compilerOptions, ...target.compilerOptions };
-      }
-
-      // Top-level array keys overwrite base definitions entirely per TypeScript standards
-      const arrayKeys: Array<keyof TsConfigShape> = ['include', 'exclude', 'files', 'references'];
-      for (const key of arrayKeys) {
+      // 2. Clear out top-level arrays that should be distinct per environment
+      const standaloneArrayKeys: Array<keyof TsConfigShape> = ['include', 'exclude', 'files', 'references'];
+      for (const key of standaloneArrayKeys) {
         if (target[key] !== undefined) {
           (merged as Record<string, unknown>)[key] = target[key];
         }
       }
 
-      // Strip the extends pointer out since it's now flat
+      // 3. Deep Merge compilerOptions safely
+      if (base.compilerOptions || target.compilerOptions) {
+        merged.compilerOptions = {
+          ...base.compilerOptions,
+          ...target.compilerOptions
+        };
+
+        // 4. Strictest Clean pass: If inheriting file explicitly overrides a compiler option array (like lib),
+        // completely overwrite it rather than letting base settings bleed through.
+        if (target.compilerOptions?.['lib']) {
+          merged.compilerOptions['lib'] = target.compilerOptions['lib'];
+        }
+        if (target.compilerOptions?.['types']) {
+          merged.compilerOptions['types'] = target.compilerOptions['types'];
+        }
+      }
+
       delete merged.extends;
     } else {
-      merged = target;
+      merged = { ...target };
     }
 
-    // Preserve schema if targeted explicitly by downstream file
+    // 5. Fixed: Handle Schema keys smoothly without breaking character escapes
     if (target['\$schema']) {
       merged['\(schema'] = target['\)schema'];
     }
 
-    // Ensure output directory exists cross-platform and write the clean JSON block
     fs.mkdirSync(path.dirname(outputPath), { recursive: true });
     fs.writeFileSync(outputPath, JSON.stringify(merged, null, 2), 'utf8');
+    console.log(`\x1b[32m✔ Successfully compiled ${path.basename(outputPath)}\x1b[0m`);
 
   } catch (error: any) {
-    console.error(
-      `\x1b[31m❌ TypeScript Configuration Monorepo Orchestrator Failure\x1b[0m\n` +
-      `========================================================================\n` +
-      `${error.message}\n` +
-      `========================================================================`
-    );
+    console.error(`\x1b[31m❌ Configuration Orchestrator Failure: ${error.message}\x1b[0m`);
     process.exitCode = 1;
   }
 }
 
-// Extract terminal input args directly
 const src = process.argv[2];
 const dest = process.argv[3];
 
 if (!src || !dest) {
-  console.error(
-    `\x1b[31m❌ TypeScript Configuration Monorepo Orchestrator Failure\x1b[0m\n` +
-    `========================================================================\n` +
-    `Missing required orchestration file arguments.\n` +
-    `   Expected Usage: yarn tsx src/merge-tsconfig.ts <src-file-path> <dest-file-path>\n` +
-    `   Received Args:  src="${src || 'undefined'}", dest="${dest || 'undefined'}"\n` +
-    `========================================================================`
-  );
+  console.error('\x1b[31m❌ Missing required arguments: <src> <dest>\x1b[0m');
   process.exitCode = 1;
 } else {
   mergeConfigs(src, dest);

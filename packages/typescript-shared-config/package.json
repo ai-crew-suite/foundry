@@ -1,7 +1,7 @@
 {
   "name": "@ai-crew-suite/typescript-shared-config",
   "description": "Extensible and reusable TypeScript configurations.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "license": "Apache-2.0",
   "keywords": [
     "ai-crew-suite",
@@ -26,13 +26,12 @@
     "directory": "packages/typescript-shared-config"
   },
   "files": [
-    "base.json",
-    "node.json",
-    "web.json"
+    "dist",
+    "README.md"
   ],
   "exports": {
-    "./node": "./node.json",
-    "./web": "./web.json"
+    "./node": "./dist/node.json",
+    "./web": "./dist/web.json"
   },
   "scripts": {
     "build": "yarn clean && yarn build:node && yarn build:web",

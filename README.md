@@ -41,6 +41,13 @@ Add a `--filter`  flag to the command:
 yarn turbo run test:unit --filter=@ai-crew-suite/plugin-kernel-backend
 ```
 
+## Publish
+
+- View your active configuration: `npm config list`
+- Set a configuration value: `npm config set registry <url>`
+- Delete a configuration: `npm config delete <key>`
+- Open your user config file in your text editor: `npm config edit`
+
 ## 📚 Documentation
 
 When adding or changing a core backend module, update the matching package README and the relevant page in the [documentation site repo](https://github.com/ai-crew-suite/documentation).

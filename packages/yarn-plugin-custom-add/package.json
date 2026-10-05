@@ -1,7 +1,7 @@
 {
   "name": "@ai-crew-suite/yarn-plugin-custom-add",
   "description": "Yarn plugin redirecting \"yarn add\" onto named catalogs in .yarnrc.yml",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "type": "module",
   "license": "Apache-2.0",
   "keywords": [
@@ -27,7 +27,13 @@
     "url": "https://github.com/ai-crew-suite/foundry",
     "directory": "packages/yarn-plugin-custom-add"
   },
-  "main": "./dist/plugin.cjs",
+  "exports": {
+    ".": {
+      "types": "./dist/yarn-plugin-custom-add-v*.d.ts",
+      "require": "./dist/yarn-plugin-custom-add-v*.cjs",
+      "default": "./dist/yarn-plugin-custom-add-v*.cjs"
+    }
+  },
   "files": [
     "dist"
   ],

@@ -1,4 +1,4 @@
-# `@ai-crew-suite/renovate-config`
+# `@ai-crew-suite/renovate-shared-config`
 
 Extensible, high-compliance dependency governance and automation presets for the AI Crew Suite platform.
 
@@ -8,17 +8,17 @@ This directory defines the global dependency lifecycle standards, version lock g
 
 ## Core Responsibilities
 
-* **Supply Chain Hardening**: Enforces strict version pins (such as clamping React to v18 and blocking Material UI v9) to prevent upstream breaking changes from crashing platform runtimes.
-* **Release Impact Isolation**: Groups and separates incoming PR notifications based on change-impact intent (`prod` vs `dev`), automatically notifying developers when a package requires a production root version bump.
-* **Audit Trail Generation**: Restricts third-party GitHub Action mutations to strict, tamper-evident cryptographic hashes while cleanly appending human-readable SemVer code annotations.
+- **Supply Chain Hardening**: Enforces strict version pins (such as clamping React to v18 and blocking Material UI v9) to prevent upstream breaking changes from crashing platform runtimes.
+- **Release Impact Isolation**: Groups and separates incoming PR notifications based on change-impact intent (`prod` vs `dev`), automatically notifying developers when a package requires a production root version bump.
+- **Audit Trail Generation**: Restricts third-party GitHub Action mutations to strict, tamper-evident cryptographic hashes while cleanly appending human-readable SemVer code annotations.
 
 ## Architectural Dependency Tree
 
 This configuration block establishes the baseline for dependency integrity and automated compliance across the broader AI Crew Suite repository network:
 
-* **Upstream Engine**: Governed by the native Renovate runtime schema and Yarn Catalog manager specifications.
-* **Downstream Consumer**: Directly consumed by every active project repository (such as `ai-crew-suite/platform`) over high-performance GitHub API data layers.
-* **Boundary Rule**: Other repositories must fetch this configuration directly using native Git-hosted relative paths. Do not attempt to import this as an npm package dependency.
+- **Upstream Engine**: Governed by the native Renovate runtime schema and Yarn Catalog manager specifications.
+- **Downstream Consumer**: Directly consumed by every active project repository (such as `ai-crew-suite/platform`) over high-performance GitHub API data layers.
+- **Boundary Rule**: Other repositories must fetch this configuration directly using native Git-hosted relative paths. Do not attempt to import this as an npm package dependency.
 
 ## Local Development Workflow
 
@@ -30,10 +30,10 @@ Because this is a static declaration block, it requires no local compilation or 
 yarn install --refresh
 
 # Verify formatting and linting
-yarn turbo run lint --filter=@ai-crew-suite/renovate-config test
+yarn turbo run lint --filter=@ai-crew-suite/renovate-shared-config test
 
 # Run tests
-yarn turbo run test:unit --filter=@ai-crew-suite/renovate-config test
+yarn turbo run test:unit --filter=@ai-crew-suite/renovate-shared-config test
 ```
 
 ### Running Verification Tracks Local Dry-Runs
@@ -41,7 +41,7 @@ yarn turbo run test:unit --filter=@ai-crew-suite/renovate-config test
 To validate changes against your local repository before merging, you can run a local test compilation:
 
 ```bash
-npx renovate-config-validator packages/renovate-config/global-rules.json
+npx renovate-shared-config-validator packages/renovate-shared-config/global-rules.json
 ```
 
 ## Consumer Usage Checklist
@@ -54,9 +54,7 @@ Create or edit your target application's local `renovate.json` file:
 
 ```json
 {
-  "extends": [
-    "npm>@ai-crew-suite/renovate-shared-config"
-  ]
+  "extends": ["npm>@ai-crew-suite/renovate-shared-config"]
 }
 ```
 
@@ -64,8 +62,8 @@ Create or edit your target application's local `renovate.json` file:
 
 Ensure your configuration architecture maps exactly to these validated execution endpoints:
 
-* [ ] **`github>ai-crew-suite/foundry//packages/renovate-config/global-rules.json`**: The core endpoint used by external project repositories to pull down global pins, schedule parameters, and release impact note blocks.
-* [ ] **`local>packages/renovate-config/global-rules.json`**: The internal fallback path used strictly inside the root of the `ai-crew-suite/foundry` repository to evaluate rules locally without network loops.
+- [ ] **`github>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules.json`**: The core endpoint used by external project repositories to pull down global pins, schedule parameters, and release impact note blocks.
+- [ ] **`local>packages/renovate-shared-config/global-rules.json`**: The internal fallback path used strictly inside the root of the `ai-crew-suite/foundry` repository to evaluate rules locally without network loops.
 
 ## Compliance and Licensing
 
