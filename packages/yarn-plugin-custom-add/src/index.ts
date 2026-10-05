@@ -50,9 +50,16 @@ const plugin: Plugin = {
   commands: [CustomAddCommand],
 
   hooks: {
-    // `yarn add` performs a project install after mutating the manifest; the
-    // validateProject hook fires inside that install flow, which is the only
-    // interception point available to plugins for blocking the native command.
+    // Intercept execution at early-boot configuration frame to halt
+    // processing BEFORE Yarn can touch or mutate package.json on disk.
+    setupScriptEnvironment: async (_project: Project, _env: Record<string, string>) => {
+      if (isNativeAddInvocation(process.argv)) {
+        process.stderr.write(`\n❌ Error: ${NATIVE_ADD_REDIRECT_MESSAGE}\n\n`);
+        process.exit(1);
+      }
+    },
+
+    // Secondary line of defense to maintain Yarn native engine error reports gracefully
     validateProject: async (_project: Project, report: Report) => {
       if (isNativeAddInvocation(process.argv)) {
         report.reportError(MessageName.UNNAMED, NATIVE_ADD_REDIRECT_MESSAGE);

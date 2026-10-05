@@ -17,6 +17,7 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { PassThrough } from 'node:stream';
 import { CustomAddCommand } from '../add';
 
+// Mock upstream CLI frameworks to eliminate internal ESM/directory resolution bugs
 vi.mock('@yarnpkg/cli', () => ({
   BaseCommand: class MockBaseCommand {
     context: any;
@@ -31,6 +32,7 @@ vi.mock('clipanion', () => ({
   },
 }));
 
+// Mock native file system and local business logic modules
 vi.mock('node:fs');
 vi.mock('../../lib/catalogFile');
 vi.mock('../../lib/confirm');
@@ -39,6 +41,7 @@ vi.mock('../../lib/parsePackageSpec');
 vi.mock('../../lib/packageManifest');
 vi.mock('../../lib/resolveTarget');
 
+// Mock core Yarn elements used inside programmatic installation steps
 vi.mock('@yarnpkg/core', async (importOriginal) => {
   const original = await importOriginal() as any;
   return {
@@ -98,15 +101,20 @@ describe('CustomAddCommand', () => {
         cwd: '/mock/repo/root',
         configuration: mockConfiguration,
         install: mockInstallSpy,
-        // Enforce an array structure so project.workspaces tracking logic works
-        workspaces: [{}, {}],
+        workspaces: [{}, {}], // Ensures project.workspaces.length > 1 evaluates to true for monorepos
       },
     };
 
     mockContext.stdout.write = vi.fn();
     mockContext.stderr.write = vi.fn();
 
-    vi.mocked(Project.find).mockResolvedValue({ project: mockContext.project } as any);
+    // FIXED MOCK ALIGNMENT: Returns the mock payload using double-mapping aliases
+    // to satisfy both "project" and "freshProject" destructuring layouts safely.
+    vi.mocked(Project.find).mockResolvedValue({
+      project: mockContext.project,
+      freshProject: mockContext.project
+    } as any);
+
     vi.mocked(Configuration.find).mockImplementation(async (cwd: any) => {
       if (!cwd) throw new Error('No Yarn project found from the provided cwd');
       return mockConfiguration;
@@ -282,6 +290,7 @@ describe('CustomAddCommand', () => {
       });
 
       const exitCode = await command.execute();
+
       expect(exitCode).toBe(1);
       expect(mockInstallSpy).not.toHaveBeenCalled();
       expect(mockContext.stderr.write).toHaveBeenCalledWith(
