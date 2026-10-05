@@ -17,7 +17,6 @@ import { describe, expect, it, vi, beforeEach } from 'vitest';
 import { PassThrough } from 'node:stream';
 import { CustomAddCommand } from '../add';
 
-// Mock upstream CLI frameworks to eliminate internal ESM/directory resolution bugs
 vi.mock('@yarnpkg/cli', () => ({
   BaseCommand: class MockBaseCommand {
     context: any;
@@ -32,7 +31,6 @@ vi.mock('clipanion', () => ({
   },
 }));
 
-// Mock native file system and local business logic modules
 vi.mock('node:fs');
 vi.mock('../../lib/catalogFile');
 vi.mock('../../lib/confirm');
@@ -41,7 +39,6 @@ vi.mock('../../lib/parsePackageSpec');
 vi.mock('../../lib/packageManifest');
 vi.mock('../../lib/resolveTarget');
 
-// Mock core Yarn elements used inside programmatic installation steps
 vi.mock('@yarnpkg/core', async (importOriginal) => {
   const original = await importOriginal() as any;
   return {
@@ -75,11 +72,12 @@ import { resolveTargetPackageJson } from '../../lib/resolveTarget';
 describe('CustomAddCommand', () => {
   let mockContext: any;
   let mockConfiguration: any;
+  let mockInstallSpy: any;
 
   beforeEach(() => {
     vi.resetAllMocks();
 
-    // resetAllMocks wipes factory-defined implementations, so restore them here
+    mockInstallSpy = vi.fn().mockResolvedValue({});
     vi.mocked(Cache.find).mockResolvedValue({} as any);
     vi.mocked(StreamReport.start).mockImplementation(async (_opts: any, cb: any) => {
       const mockReport = { hasErrors: vi.fn().mockReturnValue(false) };
@@ -87,7 +85,6 @@ describe('CustomAddCommand', () => {
       return mockReport as any;
     });
 
-    // Prevent Cache.find from breaking by mocking its map lookup interface method
     mockConfiguration = {
       get: vi.fn().mockReturnValue(new Map()),
     };
@@ -100,14 +97,15 @@ describe('CustomAddCommand', () => {
       project: {
         cwd: '/mock/repo/root',
         configuration: mockConfiguration,
-        install: vi.fn().mockResolvedValue({}),
+        install: mockInstallSpy,
+        // Enforce an array structure so project.workspaces tracking logic works
+        workspaces: [{}, {}],
       },
     };
 
     mockContext.stdout.write = vi.fn();
     mockContext.stderr.write = vi.fn();
 
-    // The command reloads the project after flushing manifests; keep returning the mock
     vi.mocked(Project.find).mockResolvedValue({ project: mockContext.project } as any);
     vi.mocked(Configuration.find).mockImplementation(async (cwd: any) => {
       if (!cwd) throw new Error('No Yarn project found from the provided cwd');
@@ -146,8 +144,6 @@ describe('CustomAddCommand', () => {
       kind: 'root',
       packageJsonPath: '/mock/repo/root/package.json',
     });
-    // Simulate a monorepo root so the confirmation guardrail engages
-    vi.mocked(readFileSync).mockReturnValue('{"workspaces": ["packages/*"]}');
     vi.mocked(confirm).mockResolvedValue(false);
 
     const exitCode = await command.execute();
@@ -168,8 +164,6 @@ describe('CustomAddCommand', () => {
       packageJsonPath: '/mock/repo/root/package.json',
     });
     vi.mocked(parsePackageSpec).mockReturnValue({ name: 'lodash', range: '^4.17.21' });
-    // Simulate a monorepo root so the confirmation guardrail engages
-    vi.mocked(readFileSync).mockReturnValue('{"workspaces": ["packages/*"]}');
 
     const exitCode = await command.execute();
     expect(exitCode).toBe(0);
@@ -211,7 +205,7 @@ describe('CustomAddCommand', () => {
     expect(exitCode).toBe(0);
     expect(resolveLatestRange).toHaveBeenCalledWith(expect.objectContaining({ packageName: 'chalk' }));
     expect(mockContext.stdout.write).toHaveBeenCalledWith(expect.stringContaining('Added "chalk" (^5.3.0)'));
-    expect(mockContext.project.install).toHaveBeenCalled();
+    expect(mockInstallSpy).toHaveBeenCalled();
   });
 
   describe('High-Compliance & Transactional Execution Guardrails (SOC-2 / FINRA / HIPAA)', () => {
@@ -236,7 +230,7 @@ describe('CustomAddCommand', () => {
       expect(writeFileSync).toHaveBeenCalledTimes(2);
       expect(mockContext.stdout.write).toHaveBeenCalledWith(expect.stringContaining('Added "react"'));
       expect(mockContext.stdout.write).toHaveBeenCalledWith(expect.stringContaining('Added "react-dom"'));
-      expect(mockContext.project.install).toHaveBeenCalledTimes(1);
+      expect(mockInstallSpy).toHaveBeenCalledTimes(1);
     });
 
     it('prevents partial state corruption by stopping the execution loop if a single package fails resolution', async () => {
@@ -264,7 +258,7 @@ describe('CustomAddCommand', () => {
       expect(exitCode).toBe(1);
 
       expect(writeFileSync).not.toHaveBeenCalled();
-      expect(mockContext.project.install).not.toHaveBeenCalled();
+      expect(mockInstallSpy).not.toHaveBeenCalled();
       expect(mockContext.stderr.write).toHaveBeenCalledWith(
         expect.stringContaining('Network timeout/Registry access denied'),
       );
@@ -289,7 +283,7 @@ describe('CustomAddCommand', () => {
 
       const exitCode = await command.execute();
       expect(exitCode).toBe(1);
-      expect(mockContext.project.install).not.toHaveBeenCalled();
+      expect(mockInstallSpy).not.toHaveBeenCalled();
       expect(mockContext.stderr.write).toHaveBeenCalledWith(
         expect.stringContaining('EACCES: permission denied'),
       );

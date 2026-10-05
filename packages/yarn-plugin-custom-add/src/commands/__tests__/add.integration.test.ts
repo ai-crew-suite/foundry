@@ -20,7 +20,6 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 
-// Corrected path walk-up depth to match the nested __tests__ location
 const packageJson = JSON.parse(readFileSync(resolve(import.meta.dirname, '../../../package.json'), 'utf8'));
 const COMPILED_PLUGIN_PATH = resolve(import.meta.dirname, `../../../dist/yarn-plugin-custom-add-v${packageJson.version}.cjs`);
 
@@ -36,7 +35,6 @@ describe('CustomAddCommand E2E Sandbox Integration', () => {
     yarnrcPath = join(sandboxDir, '.yarnrc.yml');
     packageJsonPath = join(sandboxDir, 'package.json');
 
-    // Register our plugin directly inside the sandboxed configuration manifest
     const initialYarnrc = [
       "plugins:",
       `  - path: "${COMPILED_PLUGIN_PATH}"`,

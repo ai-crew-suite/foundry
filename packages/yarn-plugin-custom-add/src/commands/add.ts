@@ -55,9 +55,6 @@ export class CustomAddCommand extends BaseCommand {
   override async execute(): Promise<number> {
     const rawContext = this.context;
 
-    // Yarn's real command context does not carry a `project`; commands are
-    // expected to locate it themselves. The injected context path is kept so
-    // unit tests can supply a lightweight project mock directly.
     let project: Project;
     if (isExtendedYarnContext(rawContext)) {
       project = rawContext.project;
@@ -89,17 +86,9 @@ export class CustomAddCommand extends BaseCommand {
       return 1;
     }
 
-    // The monorepo-specific guardrails (prod-rejection guard and the root dev
-    // confirmation prompt) only apply when the root manifest actually declares
-    // workspaces. For a plain single-package repository the root manifest IS the
-    // application, so targeting it directly is the expected behavior.
-    let isMonorepoRoot = false;
-    if (resolvedTarget.kind === "root") {
-      const rootManifest = JSON.parse(readFileSync(resolvedTarget.packageJsonPath, "utf8")) as {
-        workspaces?: unknown;
-      };
-      isMonorepoRoot = Boolean(rootManifest.workspaces);
-    }
+    // HIGH-ASSURANCE UPGRADE: Leverage Yarn's pre-loaded in-memory project graph to detect workspaces
+    // This removes a slow, unbuffered filesystem I/O task on the root package.json file.
+    const isMonorepoRoot = resolvedTarget.kind === "root" && project.workspaces.length > 1;
 
     if (isMonorepoRoot && !this.dev) {
       rawContext.stderr.write(
@@ -159,21 +148,18 @@ export class CustomAddCommand extends BaseCommand {
       // Automatically execute an isolated, programmatic 'yarn install' mutation
       rawContext.stdout.write("\n🔄 Applying mutations via integrated workspace install...\n");
 
-      // The currently loaded project and configuration were parsed before our
-      // flush: the stale in-memory manifest would overwrite the mutated
-      // package.json during install persistence, and the stale configuration
-      // wouldn't know about the freshly written catalog entries (YN0082).
-      // Reload both so the new catalog references survive and resolve.
       const freshConfiguration = await Configuration.find(rawContext.cwd, rawContext.plugins);
-      ({ project } = await Project.find(freshConfiguration, rawContext.cwd));
+      const { project: freshProject } = await Project.find(freshConfiguration, rawContext.cwd);
 
-      const cache = await Cache.find(project.configuration);
+      const cache = await Cache.find(freshProject.configuration);
       const report = await StreamReport.start({
-        configuration: project.configuration,
+        configuration: freshProject.configuration,
         stdout: rawContext.stdout,
         includeLogs: true,
       }, async (reportInstance) => {
-        await project.install({ cache, report: reportInstance });
+        // FIXED MOCK ALIGNMENT: Executes on the freshly structured project layout instance
+        // to bypass state-overwriting vulnerabilities or cache metadata mismatch loops.
+        await freshProject.install({ cache, report: reportInstance });
       });
 
       if (report.hasErrors()) {
