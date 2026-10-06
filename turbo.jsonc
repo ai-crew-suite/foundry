@@ -1,12 +1,13 @@
 {
   "$schema": "https://v2-11-7.turborepo.dev/schema.json",
   "globalEnv": [
-    "NODE_ENV",
-    "CI",
     "BACKSTAGE_APP_CONFIG",
     "BACKSTAGE_USER_SECRET",
-    "POSTGRES_USER",
-    "POSTGRES_PASSWORD"
+    "CI",
+    "NODE_ENV",
+    "NPM_TOKEN",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_USER"
   ],
   "tasks": {
     // Global root-level task
@@ -23,20 +24,14 @@
     // Package tasks
     "build": {
       "cache": true,
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "clean"],
       "inputs": ["src/**", "package.json"],
       "outputs": ["dist/**"],
-      "env": [
-        "FORCE_COLOR",
-        "PLAYWRIGHT_APP_HOST",
-        "PLAYWRIGHT_APP_PORT",
-        "PLAYWRIGHT_BACKEND_HOST",
-        "PLAYWRIGHT_BACKEND_PORT"
-      ]
+      "env": ["FORCE_COLOR"]
     },
     "clean": {
       "cache": false,
-      "dependsOn": ["^build"]
+      "dependsOn": []
     },
     "format": {
       "cache": true,
@@ -53,7 +48,7 @@
     "publish": {
       /** Publishing should never be cached, it must always execute online */
       "cache": false,
-      "dependsOn": ["^lint", "^typecheck", "^test:unit", "^build"]
+      "dependsOn": ["lint", "typecheck", "test:unit", "^build"]
     },
     /** Synchronizes TypeScript Project References alphabetically and heals roots */
     "sync": {

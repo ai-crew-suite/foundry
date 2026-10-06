@@ -29,9 +29,7 @@
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": {
-    "backstage-config-typegen": "./dist/bin/sync-config.js"
-  },
+  "bin": "./dist/bin/sync-config.js",
   "files": [
     "dist"
   ],
