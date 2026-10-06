@@ -6,27 +6,7 @@ This package is a script for using `package.json` that keeps a Backstage plugin'
 
 This keeps `config.d.ts` self-contained for config-schema loading while ensuring runtime source code never imports it directly, so the emitted `dist-types` tree stays resolvable by the declaration bundler.
 
-## Core Responsibilities
-
-- Parses `config.d.ts` and locates the top-level `Config` interface.
-- Extracts the source text of a named property's type (`ai` by default).
-- Writes a `MACHINE GENERATED DO NOT MODIFY DIRECTLY` file exporting that type under a stable name (`AiBackendConfig` by default).
-- Fails loudly with a descriptive error when the requested property is missing.
-
-## Local Development Workflow
-
-```sh
-# Verify formatting and linting
-yarn turbo run lint --filter=@ai-crew-suite/backstage-config-typegen
-
-# Run tests
-yarn turbo run test:unit --filter=@ai-crew-suite/backstage-config-typegen
-
-# Build
-yarn turbo run build --filter=@ai-crew-suite/backstage-config-typegen
-```
-
-## Consumer Usage
+## Usage
 
 Add the package as a `devDependency` of a Backstage plugin package that ships a `config.d.ts` file at its root and a `src/types/index.ts` runtime types file, then add a script:
 
@@ -74,6 +54,26 @@ To let Turborepo manage your caching correctly, register the task explicitly ins
       "inputs": ["config.d.ts"],
       "outputs": ["src/types/config.generated.ts"]
     }
+```
+
+## Core Responsibilities
+
+- Parses `config.d.ts` and locates the top-level `Config` interface.
+- Extracts the source text of a named property's type (`ai` by default).
+- Writes a `MACHINE GENERATED DO NOT MODIFY DIRECTLY` file exporting that type under a stable name (`AiBackendConfig` by default).
+- Fails loudly with a descriptive error when the requested property is missing.
+
+## Local Development Workflow
+
+```sh
+# Verify formatting and linting
+yarn turbo run lint --filter=@ai-crew-suite/backstage-config-typegen
+
+# Run tests
+yarn turbo run test:unit --filter=@ai-crew-suite/backstage-config-typegen
+
+# Build
+yarn turbo run build --filter=@ai-crew-suite/backstage-config-typegen
 ```
 
 ## Compliance and Licensing

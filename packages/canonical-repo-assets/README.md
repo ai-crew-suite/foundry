@@ -1,4 +1,4 @@
-# `@ai-crew-suite/canonical-repo-assets`
+# Synchronize Static Files Across Repositories
 
 Centralized static repository assets, governance templates, and synchronization manifest for the AI Crew Suite platform.
 
@@ -6,7 +6,7 @@ Centralized static repository assets, governance templates, and synchronization 
 
 This package serves as the single source of truth for repository configurations, development toolchain presets, governance documentation, and AI agent guardrails across the AI Crew Suite ecosystem. It maintains both the canonical copies of shared files and a declarative manifest (`manifest.json`) that dictates how these assets are synchronized into downstream repositories.
 
-Synchronization is performed automatically via GitHub Actions workflows (such as the Framework Alignment Validation workflow in the Foundry repository), which invoke the `ai-crew-suite/actions/sync-static-files` action to open automated pull requests across all participating repositories whenever canonical templates change.
+Synchronization is performed automatically via GitHub Actions workflows (such as the Framework Alignment Validation workflow in the Foundry repository), which invoke the `ai-crew-suite/pipelines/actions/sync-static-files` action to open automated pull requests across all participating repositories whenever canonical templates change.
 
 ## Core Responsibilities
 

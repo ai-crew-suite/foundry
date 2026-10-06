@@ -18,7 +18,6 @@
     "format:turbo": "node node_modules/@turbo/codemod/dist/cli.js migrate .",
     "install:setup": "husky",
     "lint": "turbo lint",
-    "lint:changed": "turbo lint --filter=[HEAD~1]",
     "lint:turbo": "node node_modules/@turbo/codemod/dist/cli.js migrate . --dry --print",
     "release": "turbo run lint typecheck test:unit build && yarn dotenv -- crew publish",
     "sync": "crew sync:refs",

@@ -1,4 +1,4 @@
-# `@ai-crew-suite/renovate-shared-config`
+# Shared Configuration for Renovate Bot
 
 Extensible, high-compliance dependency governance and automation presets for the AI Crew Suite platform.
 
@@ -19,6 +19,24 @@ This configuration block establishes the baseline for dependency integrity and a
 - **Upstream Engine**: Governed by the native Renovate runtime schema and Yarn Catalog manager specifications.
 - **Downstream Consumer**: Directly consumed by every active project repository (such as `ai-crew-suite/platform`) over high-performance GitHub API data layers.
 - **Boundary Rule**: Other repositories must fetch this configuration directly using native Git-hosted relative paths. Do not attempt to import this as an npm package dependency.
+
+## Usage
+
+Create or edit your target a repo root `renovate.json` file. Renovate uses a `//` delimiter to separate the repository name from the internal file path.
+
+```json
+{
+  "extends": ["github>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"]
+}
+```
+
+Within the `foundry` repo, where the renovate rules are maintained:
+
+```json
+{
+  "extends": ["local>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"]
+}
+```
 
 ## Local Development Workflow
 
@@ -42,28 +60,6 @@ To validate changes against your local repository before merging, you can run a 
 
 ```bash
 npx renovate-shared-config-validator packages/renovate-shared-config/global-rules.json
-```
-
-## Consumer Usage Checklist
-
-To inherit these global dependency standards and automated PR note templates inside an external platform or project repository, drop a `renovate.json` file into the root of that repository using this exact format:
-
-### Configure in a Repo
-
-Create or edit your target a repo root `renovate.json` file. Renovate uses a `//` delimiter to separate the repository name from the internal file path.
-
-```json
-{
-  "extends": ["github>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"]
-}
-```
-
-Within the `foundry` repo, where the renovate rules are maintained:
-
-```json
-{
-  "extends": ["local>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"]
-}
 ```
 
 ## Compliance and Licensing

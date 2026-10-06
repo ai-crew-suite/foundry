@@ -46,14 +46,20 @@
     {
       "description": "Mute internal action noise: absorb minor/patch changes natively via moving major tags, but explicitly surface new major stream updates",
       "matchManagers": ["github-actions"],
-      "matchPackageNames": ["ai-crew-suite/actions", "ai-crew-suite/actions/analyze-codeql"],
+      "matchPackageNames": [
+        "ai-crew-suite/pipelines/actions",
+        "ai-crew-suite/pipelines/actions/analyze-codeql"
+      ],
       "matchUpdateTypes": ["minor", "patch", "digest"],
       "enabled": false
     },
     {
       "description": "Allow major internal action upgrades, ensuring they bypass the default pinGitHubActionDigests parser to keep floating major tags intact",
       "matchManagers": ["github-actions"],
-      "matchPackageNames": ["ai-crew-suite/actions", "ai-crew-suite/actions/analyze-codeql"],
+      "matchPackageNames": [
+        "ai-crew-suite/pipelines/actions",
+        "ai-crew-suite/pipelines/actions/analyze-codeql"
+      ],
       "matchUpdateTypes": ["major"],
       "pinDigests": false,
       "groupName": "Internal Tooling Infrastructure",

@@ -1,4 +1,4 @@
-# 🧰 AI Crew Suite CLI & Developer Toolbelt (`@ai-crew-suite/crew-cli`)
+# 🧰 AI Crew Suite CLI & Developer Toolbelt
 
 This package is the centralized developer toolbelt and workspace orchestrator for use in AI Crew Suite repos. It consolidates all building, cleaning, linting, typechecking, and testing workflows into a single, high-performance binary utility.
 

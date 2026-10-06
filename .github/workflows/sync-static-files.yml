@@ -1,9 +1,9 @@
-name: Framework Alignment Validation
+name: Static File Sync
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 0 * * 1" # Runs every Monday
+    - cron: "0 0 * * 1" # Runs every Monday at midnight
 
 permissions:
   contents: read
@@ -14,10 +14,12 @@ jobs:
     steps:
       - name: 📂 Checkout Repository Codebase
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: 🔍 Sync Static Infrastructure Files
-        uses: ai-crew-suite/actions/sync-static-files@v1
+        uses: ai-crew-suite/pipelines/actions/sync-static-files@v1
         with:
-          static_files_path: "static-repo-files-sync"
+          static_files_path: "static-files-sync"
           GH_PAT: ${{ secrets.GLOBAL_INFRA_PAT }}
           PR_LABELS: "infrastructure, automated-sync"

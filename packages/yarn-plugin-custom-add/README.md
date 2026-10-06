@@ -6,8 +6,16 @@ The AI Crew Suite monorepos use Yarn Named Catalogs to manage dependency version
 
 There are two primary named catalogs maintained within the root `.yarnrc.yml` file:
 
-* `prod`: Production dependencies.
-* `dev`: Development and tooling dependencies.
+- `prod`: Production dependencies.
+- `dev`: Development and tooling dependencies.
+
+## Usage
+
+To install or update the plugin inside a workspace repository, run the following from the repo root:
+
+```bash
+yarn plugin import @ai-crew-suite/yarn-plugin-custom-add
+```
 
 ### Dependency Protocols Pattern
 
@@ -30,7 +38,15 @@ This plugin improves developer workflow and enforces dependency catalog complian
 
 To ensure absolute compliance with configuration drift policies, **the native `yarn add` command is completely disabled in this repository** across all developer environments (including Windows shells). Attempting to execute `yarn add` will abort immediately without modifying any workspace files.
 
-## Usage
+## Core Responsibilities
+
+- **Preemptive Interception**: Blocks native `yarn add` via early-boot `setupScriptEnvironment` hooks before any files are altered on disk.
+- **Version Spec Resolution**: Extracts version tokens using industry-standard `npm-package-arg`. If the version string is omitted, it queries the authenticated registry server for the `latest` dist-tag using Yarn's built-in proxy-aware `httpUtils`.
+- **Target Workspace Mapping**: Automatically resolves directories using Yarn's runtime workspace memory graph or relative containment bounds. It prevents path traversal exploits outside of the repository root.
+- **Transactional File Flushes**: Updates `.yarnrc.yml` and the target `package.json` completely in-memory, performing atomic writes to physical disk assets only after absolute verification while preserving layout aesthetics, comments, and spacing alignments.
+- **Integrated Installation**: Automatically invokes an in-memory `project.install()` sequence immediately following successful file writes to lock down the dependency tree.
+
+## Local Development Workflow
 
 All dependency updates must be executed via the custom `catalog-add` command:
 
@@ -46,24 +62,6 @@ yarn catalog-add lodash --target packages/crew-cli --dev
 
 # Add a package with an explicit version constraint instead of fetching npm "latest"
 yarn catalog-add lodash@^4.17.21 --target packages/crew-cli
-```
-
-## Core Responsibilities
-
-* **Preemptive Interception**: Blocks native `yarn add` via early-boot `setupScriptEnvironment` hooks before any files are altered on disk.
-* **Version Spec Resolution**: Extracts version tokens using industry-standard `npm-package-arg`. If the version string is omitted, it queries the authenticated registry server for the `latest` dist-tag using Yarn's built-in proxy-aware `httpUtils`.
-* **Target Workspace Mapping**: Automatically resolves directories using Yarn's runtime workspace memory graph or relative containment bounds. It prevents path traversal exploits outside of the repository root.
-* **Transactional File Flushes**: Updates `.yarnrc.yml` and the target `package.json` completely in-memory, performing atomic writes to physical disk assets only after absolute verification while preserving layout aesthetics, comments, and spacing alignments.
-* **Integrated Installation**: Automatically invokes an in-memory `project.install()` sequence immediately following successful file writes to lock down the dependency tree.
-
-## Distribution & Installation
-
-This plugin is compiled as a self-contained, version-tagged CommonJS bundle. To install or update the plugin inside a workspace repository, copy the target compiled asset to your local plugin storage folder and map the relative registration reference inside your root `.yarnrc.yml`:
-
-```yml
-plugins:
-  - path: .yarn/plugins/yarn-plugin-custom-add-v0.0.1.cjs
-    spec: "@ai-crew-suite/yarn-plugin-custom-add"
 ```
 
 ## Local Development Workflow
