@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>packages/renovate-config/global-rules.json"
+    "local>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"
   ]
 }

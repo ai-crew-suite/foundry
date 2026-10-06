@@ -48,22 +48,23 @@ npx renovate-shared-config-validator packages/renovate-shared-config/global-rule
 
 To inherit these global dependency standards and automated PR note templates inside an external platform or project repository, drop a `renovate.json` file into the root of that repository using this exact format:
 
-### Configure the Target Base
+### Configure in a Repo
 
-Create or edit your target application's local `renovate.json` file:
+Create or edit your target a repo root `renovate.json` file. Renovate uses a `//` delimiter to separate the repository name from the internal file path.
 
 ```json
 {
-  "extends": ["npm>@ai-crew-suite/renovate-shared-config"]
+  "extends": ["github>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"]
 }
 ```
 
-### Validation Target Matrix
+Within the `foundry` repo, where the renovate rules are maintained:
 
-Ensure your configuration architecture maps exactly to these validated execution endpoints:
-
-- [ ] **`github>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules.json`**: The core endpoint used by external project repositories to pull down global pins, schedule parameters, and release impact note blocks.
-- [ ] **`local>packages/renovate-shared-config/global-rules.json`**: The internal fallback path used strictly inside the root of the `ai-crew-suite/foundry` repository to evaluate rules locally without network loops.
+```json
+{
+  "extends": ["local>ai-crew-suite/foundry//packages/renovate-shared-config/global-rules"]
+}
+```
 
 ## Compliance and Licensing
 
