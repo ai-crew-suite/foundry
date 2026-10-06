@@ -99,6 +99,26 @@ describe('runPublishPipeline Orchestrator', () => {
     expect(spawnSync).not.toHaveBeenCalled();
   });
 
+  it('should accept turbo.jsonc as a valid root workspace marker and execute changesets publish', () => {
+    vi.mocked(fs.existsSync).mockImplementation((targetPath) => {
+      if (typeof targetPath === 'string') {
+        return targetPath.endsWith('turbo.jsonc') || targetPath.endsWith('.changeset');
+      }
+      return false;
+    });
+    testEnv.mockAllSuccessful();
+
+    const success = runPublishPipeline([]);
+
+    expect(success).toBe(true);
+    expect(process.exitCode).toBe(0);
+    expect(spawnSync).toHaveBeenCalledWith(
+      'yarn',
+      ['changeset', 'publish'],
+      expect.objectContaining({ cwd: process.cwd() })
+    );
+  });
+
   it('should explicitly forward multiple continuous CLI deployment flags as separate positional array parameters', () => {
     vi.mocked(fs.existsSync).mockReturnValue(true);
     testEnv.mockAllSuccessful();

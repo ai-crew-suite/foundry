@@ -121,6 +121,9 @@ __metadata:
     turbo: "catalog:dev"
     typescript: "catalog:dev"
     whatwg-fetch: "catalog:dev"
+  dependenciesMeta:
+    re2:
+      built: true
   languageName: unknown
   linkType: soft
 

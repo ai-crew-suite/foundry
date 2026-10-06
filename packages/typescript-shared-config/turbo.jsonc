@@ -1,10 +1,10 @@
 {
   "extends": ["//"],
   "tasks": {
-    /** Remove dependsOn from build task that does not depend on Crew CLI for package */
+    /** Build requires crew-cli's dist/ because the build script invokes `crew clean`. */
     "build": {
       "cache": true,
-      "dependsOn": []
+      "dependsOn": ["@ai-crew-suite/crew-cli#build"]
     },
     "build:node": {
       "cache": true,

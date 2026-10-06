@@ -6,7 +6,7 @@
     {
       "description": "Extract and update the version inside the root backstage.json file",
       "customType": "regex",
-      "fileMatch": ["backstage.json"],
+      "managerFilePatterns": ["/backstage.json/"],
       "matchStrings": ["\"version\":\\s*\"(?<currentValue>[^\"]+)\""],
       "depNameTemplate": "@backstage/core",
       "datasourceTemplate": "npm"

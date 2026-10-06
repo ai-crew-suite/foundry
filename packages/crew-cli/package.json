@@ -39,7 +39,6 @@
     "build": "yarn clean && rollup --config rollup.config.ts --configPlugin esbuild",
     "clean": "rimraf dist",
     "lint": "eslint .",
-    "publish": "npm publish",
     "test": "yarn test:run",
     "test:unit": "vitest run --config ./vitest.config.ts",
     "test:unit:coverage": "vitest run --coverage --config ./vitest.config.ts",

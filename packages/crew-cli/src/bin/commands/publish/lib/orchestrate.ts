@@ -26,9 +26,12 @@ import path from 'node:path';
 export function runPublishPipeline(forwardedArgs: string[]): boolean {
   const currentWorkingDir = process.cwd();
 
-  // 1. Guardrail: Enforce running strictly from the Monorepo Root Workspace
-  const hasRootFiles = fs.existsSync(path.resolve(currentWorkingDir, 'turbo.json')) && 
-                       fs.existsSync(path.resolve(currentWorkingDir, '.changeset'));
+  // 1. Guardrail: Enforce running strictly from the Monorepo Root Workspace.
+  // Turbo configuration may be named turbo.json (dependent repos) or turbo.jsonc (this repo).
+  const hasTurboConfig =
+    fs.existsSync(path.resolve(currentWorkingDir, 'turbo.json')) ||
+    fs.existsSync(path.resolve(currentWorkingDir, 'turbo.jsonc'));
+  const hasRootFiles = hasTurboConfig && fs.existsSync(path.resolve(currentWorkingDir, '.changeset'));
 
   if (!hasRootFiles) {
     console.error(

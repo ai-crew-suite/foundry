@@ -1,0 +1,3 @@
+# Intentionally malformed test fixtures for merge-tsconfig error-path tests.
+# These files must NOT be formatted by Prettier.
+src/scripts/__fixtures__/

@@ -4,7 +4,9 @@
   "tasks": {
     "build": {
       "cache": true,
-      "dependsOn": [],
+      // The build script invokes `crew clean`, which requires crew-cli's built
+      // dist/ artifacts to exist before this task can start.
+      "dependsOn": ["@ai-crew-suite/crew-cli#build"],
       "inputs": ["src/**", "package.json"],
       "outputs": ["dist/**"]
     }

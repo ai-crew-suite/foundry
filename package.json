@@ -20,7 +20,7 @@
     "lint": "turbo lint",
     "lint:changed": "turbo lint --filter=[HEAD~1]",
     "lint:turbo": "node node_modules/@turbo/codemod/dist/cli.js migrate . --dry --print",
-    "release": "yarn dotenv -- turbo run publish",
+    "release": "turbo run lint typecheck test:unit build && yarn dotenv -- crew publish",
     "sync": "crew sync:refs",
     "test": "yarn test:unit && yarn test:e2e && yarn test:unit:coverage",
     "test:unit": "turbo run test:unit",
@@ -53,6 +53,11 @@
     "turbo": "catalog:dev",
     "typescript": "catalog:dev",
     "whatwg-fetch": "catalog:dev"
+  },
+  "dependenciesMeta": {
+    "re2": {
+      "built": true
+    }
   },
   "resolutions": {
     "@types/node": "22.20.5",
