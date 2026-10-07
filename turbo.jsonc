@@ -31,13 +31,13 @@
     "format": {
       "cache": true,
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      "inputs": [],
       "outputs": []
     },
     "lint": {
       "cache": true,
       "dependsOn": ["^build"],
-      "inputs": ["$TURBO_DEFAULT$"],
+      "inputs": [],
       "outputs": []
     },
     /** Synchronizes TypeScript Project References alphabetically and heals roots */
