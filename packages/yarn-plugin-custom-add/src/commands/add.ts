@@ -172,6 +172,8 @@ export class CustomAddCommand extends BaseCommand {
     }
 
     rawContext.stdout.write('🎉 Workspace configurations synchronized successfully.\n');
+    rawContext.stdout.write('💡 IMPORTANT: Stage and commit your `package.json`, `yarn.lock`, and `.yarn/cache/` files right now before writing code or switching branches.\n');
+    rawContext.stdout.write('   This locks down the immutable offline zip archives, preventing local cache synchronization errors and background tooling locks.\n');
     return 0;
   }
 }

@@ -18,6 +18,6 @@
  * Linting is handled by the ai-crew-suite CLI. This file is necessary
  * for IDE ESLint extensions to automatically pick up linting config.
  */
-import { createFlatConfigForWorkspace } from '@ai-crew-suite/crew-cli/config/eslint';
+import { createFlatConfigForWorkspace } from './packages/crew-cli/src';
 
 export default createFlatConfigForWorkspace();
