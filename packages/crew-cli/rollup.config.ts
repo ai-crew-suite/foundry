@@ -23,13 +23,12 @@ import resolve from '@rollup/plugin-node-resolve';
 
 const currentDir = import.meta.dirname;
 
+// Core input files for the CLI binary infrastructure
 const entryPoints = globSync([
   path.resolve(currentDir, 'src/bin/crew.ts'),
   path.resolve(currentDir, 'src/bin/commands/**/*.ts'),
   path.resolve(currentDir, 'src/bin/utils/*.ts'),
 ]);
-
-const outputDir = path.resolve(currentDir, 'dist/bin');
 
 const executableEntryPattern = /\/src\/bin\/(crew|commands\/[^/]+\/index)\.ts$/;
 
@@ -44,15 +43,16 @@ const externalChecker = (id: string): boolean => {
 };
 
 export default defineConfig([
-  // 1. Build the JavaScript/ESM modules with esbuild
+  // Build the entire execution codebase (CLI binaries + Programmatic root index)
   {
-    input: entryPoints,
+    // Include the new src/index.ts alongside your standard CLI files
+    input: [...entryPoints, path.resolve(currentDir, 'src/index.ts')],
     output: {
-      dir: outputDir,
+      dir: path.resolve(currentDir, 'dist'),
       format: 'esm',
       sourcemap: true,
       preserveModules: true,
-      preserveModulesRoot: path.resolve(currentDir, 'src/bin'),
+      preserveModulesRoot: path.resolve(currentDir, 'src'), // Keeps "bin/" structure distinct from root index.js
       entryFileNames: '[name].js',
       /** Inject a shebang only into files intended to be invoked directly. */
       banner: ({ facadeModuleId }) =>
@@ -92,15 +92,13 @@ export default defineConfig([
       }
     ]
   },
-  // 2. Build and bundle corresponding type definitions (.d.ts) preserving structure
+
+  // Bundle 100% types into one single unified index.d.ts file
   {
-    input: entryPoints,
+    input: path.resolve(currentDir, 'src/index.ts'), // Traces public exports only
     output: {
-      dir: outputDir,
+      file: path.resolve(currentDir, 'dist/index.d.ts'),
       format: 'esm',
-      preserveModules: true,
-      preserveModulesRoot: path.resolve(currentDir, 'src/bin'),
-      entryFileNames: '[name].d.ts',
     },
     external: externalChecker,
     plugins: [

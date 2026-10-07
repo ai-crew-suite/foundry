@@ -29,14 +29,16 @@
     "crew": "./dist/bin/crew.js"
   },
   "exports": {
-    "./config/eslint": "./dist/bin/commands/lint/config/factory.js",
-    "./storybook/mocks": "./src/bin/commands/storybook/lib/mockUtils.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "yarn clean && rollup --config rollup.config.ts --configPlugin esbuild",
+    "build": "yarn clean && rollup --config rollup.config.ts --configPlugin esbuild && tsc --emitDeclarationOnly --outDir dist",
     "clean": "rimraf dist",
     "lint": "eslint .",
     "test": "yarn test:run",

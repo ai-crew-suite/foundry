@@ -105,7 +105,7 @@ This toolkit exposes zero-boilerplate configuration hooks directly to the monore
 
 ```javascript
 // eslint.config.js (At Monorepo Root)
-import { createFlatConfigForWorkspace } from '@ai-crew-suite/crew-cli/config/eslint';
+import { createFlatConfigForWorkspace } from '@ai-crew-suite/crew-cli';
 
 export default createFlatConfigForWorkspace();
 ```
