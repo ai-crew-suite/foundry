@@ -13,7 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { vi, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+/**
+ * Shared Vitest setup file for packages running tests through `crew test:unit`.
+ *
+ * NOTE: this setup deliberately does NOT register a global `beforeEach` that
+ * calls `vi.resetAllMocks()`. A global reset silently wipes mock implementations
+ * that consuming packages install at module scope or inside `beforeAll`
+ * (for example `getOctokit: vi.fn().mockImplementation(...)`), breaking their
+ * tests with "Cannot read properties of undefined" errors. Packages that want
+ * per-test resets should register their own `beforeEach` hook instead.
+ */
+import { vi, afterEach, beforeAll, afterAll } from 'vitest';
 
 declare global {
   var jest: {
@@ -85,10 +95,6 @@ beforeAll(() => {
     if (message?.toString().includes('Warning: ReactDOM.render is deprecated')) return;
     console.warn(message);
   });
-});
-
-beforeEach(() => {
-  vi.resetAllMocks();
 });
 
 afterEach(() => {

@@ -16,3 +16,6 @@ Fix `crew build` and `crew format` failing with `MODULE_NOT_FOUND`; make `crew t
   config, so packages need no boilerplate config unless they customize. The
   shared Vitest config is also exposed as a `createCrewVitestConfig(overrides)`
   factory on the package's programmatic API for consumers to extend.
+- The shared Vitest setup no longer calls `vi.resetAllMocks()` in a global
+  `beforeEach`, which silently wiped mock implementations installed by
+  consuming packages at module scope or inside `beforeAll`.
