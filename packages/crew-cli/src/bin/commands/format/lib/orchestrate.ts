@@ -28,8 +28,25 @@ const require = createRequire(import.meta.url);
 export function runFormatPipeline(context: WorkspaceContext, forwardedArgs: string[]): boolean {
   console.log(`${chalk.blue('✨ Formatting text layouts inside:')} ${chalk.bold(context.packageName)}`);
 
-  const prettierPackageJson = require.resolve('prettier/package.json');
-  const prettierBin = path.resolve(path.dirname(prettierPackageJson), 'bin-prettier.js');
+  const prettierPackageJsonPath = require.resolve('prettier/package.json');
+  const prettierPackageJson = require(prettierPackageJsonPath) as {
+    bin?: string | Record<string, string>;
+  };
+
+  // Resolve the CLI entry from the installed Prettier's own "bin" field so the
+  // pipeline survives bin layout changes across Prettier major versions
+  // (v2 shipped "bin-prettier.js" at the package root, v3 ships "bin/prettier.cjs").
+  const prettierBinEntry = typeof prettierPackageJson.bin === 'string'
+    ? prettierPackageJson.bin
+    : prettierPackageJson.bin?.['prettier'];
+
+  if (!prettierBinEntry) {
+    console.error(chalk.red('❌ Failed to resolve the Prettier CLI entrypoint from its package.json "bin" field.'));
+    process.exitCode = 1;
+    return false;
+  }
+
+  const prettierBin = path.resolve(path.dirname(prettierPackageJsonPath), prettierBinEntry);
 
   // If the user doesn't pass specific targets, default to checking/writing the current package directory files
   const executionFlags = forwardedArgs.length > 0 ? forwardedArgs : ['--write', '.'];

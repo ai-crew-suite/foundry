@@ -15,12 +15,35 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
+import path from 'node:path';
 import { runFormatPipeline } from '../orchestrate';
 import { mockWorkspaceContext, setupOrchestratorTestContext } from '../../../../utils/index';
 
 vi.mock('node:child_process', () => ({
   spawnSync: vi.fn(),
 }));
+
+const require = createRequire(import.meta.url);
+
+/**
+ * Resolves the installed Prettier CLI entrypoint the same way the pipeline does,
+ * so the assertion tracks the actual "bin" field of whatever Prettier version
+ * is installed instead of pinning a version-specific file layout.
+ */
+function resolveInstalledPrettierBin(): string {
+  const prettierPackageJsonPath = require.resolve('prettier/package.json');
+  const prettierPackageJson = require(prettierPackageJsonPath) as {
+    bin: string | Record<string, string>;
+  };
+  const binEntry = typeof prettierPackageJson.bin === 'string'
+    ? prettierPackageJson.bin
+    : prettierPackageJson.bin['prettier'];
+  if (!binEntry) {
+    throw new Error('Installed Prettier package.json has no "prettier" bin entry');
+  }
+  return path.resolve(path.dirname(prettierPackageJsonPath), binEntry);
+}
 
 describe('runFormatPipeline Orchestrator', () => {
   const testEnv = setupOrchestratorTestContext();
@@ -36,7 +59,7 @@ describe('runFormatPipeline Orchestrator', () => {
 
     expect(spawnSync).toHaveBeenCalledWith(
       process.execPath,
-      [expect.stringContaining('bin-prettier.js'), '--write', '.'],
+      [resolveInstalledPrettierBin(), '--write', '.'],
       expect.objectContaining({ cwd: mockWorkspaceContext.packageDir })
     );
   });
@@ -49,7 +72,7 @@ describe('runFormatPipeline Orchestrator', () => {
 
     expect(spawnSync).toHaveBeenCalledWith(
       process.execPath,
-      [expect.stringContaining('bin-prettier.js'), '--check', 'src/**/*.ts'],
+      [resolveInstalledPrettierBin(), '--check', 'src/**/*.ts'],
       expect.any(Object)
     );
   });
