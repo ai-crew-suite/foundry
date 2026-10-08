@@ -42,7 +42,8 @@ describe('runBuildPipeline Orchestrator', () => {
     expect(spawnSync).toHaveBeenNthCalledWith(
       1,
       'node',
-      [expect.stringContaining('crew.js'), 'clean'],
+      // The main CLI binary must resolve to <pkg>/(src|dist)/bin/crew.js, never a nonexistent sibling like dist/crew.js
+      [expect.stringMatching(/(?:^|.*[\\/])bin[\\/]crew\.js$/), 'clean'],
       expect.objectContaining({ cwd: mockWorkspaceContext.packageDir })
     );
 
@@ -50,7 +51,7 @@ describe('runBuildPipeline Orchestrator', () => {
     expect(spawnSync).toHaveBeenNthCalledWith(
       2,
       'node',
-      [expect.stringContaining('crew.js'), 'sync:refs'],
+      [expect.stringMatching(/(?:^|.*[\\/])bin[\\/]crew\.js$/), 'sync:refs'],
       expect.objectContaining({ cwd: mockWorkspaceContext.packageDir })
     );
 

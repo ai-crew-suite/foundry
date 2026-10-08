@@ -29,8 +29,9 @@ const require = createRequire(import.meta.url);
  * @returns boolean true if the entire sequence was successful, false if a child process failed.
  */
 export function runBuildPipeline(context: WorkspaceContext, forwardedArgs: string[]): boolean {
-  // Target parent directory structure using path configurations derived safely via workspace context mapping
-  const mainCliPath = path.resolve(__dirname, '../../../../crew.js');
+  // The built command modules live at dist/bin/commands/build/lib, so the main
+  // crew binary (package.json "bin": "./dist/bin/crew.js") sits three levels up.
+  const mainCliPath = path.resolve(__dirname, '../../../crew.js');
 
   console.log('\x1b[34m⎋ Triggering pre-build clean cycle...\x1b[0m');
 

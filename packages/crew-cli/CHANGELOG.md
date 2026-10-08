@@ -1,5 +1,11 @@
 # @ai-crew-suite/crew-cli
 
+## 0.0.4
+
+### Patch Changes
+
+- Fix Rollup build to correct output directory in crew-cli
+
 ## 0.0.3
 
 ### Patch Changes
