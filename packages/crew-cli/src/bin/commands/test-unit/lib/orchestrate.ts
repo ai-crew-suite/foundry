@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
@@ -21,20 +22,44 @@ import type { WorkspaceContext } from '../../../utils/workspace';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+/** Local Vitest config file names that packages may provide to customize their test setup. */
+const LOCAL_VITEST_CONFIG_FILENAMES = [
+  'vitest.config.ts',
+  'vitest.config.js',
+  'vitest.config.mts',
+  'vitest.config.mjs',
+  'vitest.config.cts',
+  'vitest.config.cjs',
+];
+
 /**
  * Orchestrates the full Vitest unit test runner matrix.
  * Targets the package-specific folder context and manages process exit states cleanly.
+ *
+ * Config selection order: an explicit `--config` flag forwarded by the developer
+ * always wins, then a local `vitest.config.*` in the package directory (the
+ * consumer-side extension point), and finally the shared crew-cli config —
+ * so packages need no boilerplate config unless they actually customize something.
  */
 export function runUnitTestsPipeline(context: WorkspaceContext, forwardedArgs: string[]): boolean {
   console.log(
     `${chalk.blue('🧪 Executing Unit Tests for:')} ${chalk.bold(context.packageName)} ${chalk.gray(`(${context.role})`)}`
   );
 
-  const internalConfigPath = path.resolve(__dirname, 'vitest.config.js');
+  const hasExplicitConfigFlag = forwardedArgs.includes('-c') || forwardedArgs.includes('--config');
+  const hasLocalConfig = LOCAL_VITEST_CONFIG_FILENAMES.some((filename) =>
+    fs.existsSync(path.resolve(context.packageDir, filename)),
+  );
+
+  if (!hasExplicitConfigFlag && hasLocalConfig) {
+    console.log(`${chalk.gray('⎋ Detected a local vitest config — letting Vitest use it instead of the shared crew-cli config')}`);
+  }
+
+  const configArgs = hasExplicitConfigFlag || hasLocalConfig ? [] : ['-c', path.resolve(__dirname, 'vitest.config.js')];
 
   const testResult = spawnSync(
     'yarn',
-    ['vitest', 'run', '-c', internalConfigPath, ...forwardedArgs],
+    ['vitest', 'run', ...configArgs, ...forwardedArgs],
     {
       stdio: 'inherit',
       shell: true,

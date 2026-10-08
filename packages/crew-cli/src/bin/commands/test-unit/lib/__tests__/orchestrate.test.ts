@@ -15,6 +15,9 @@
  */
 import { describe, it, expect, vi } from 'vitest';
 import { spawnSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { runUnitTestsPipeline } from '../orchestrate';
 import { mockWorkspaceContext, setupOrchestratorTestContext } from '../../../../utils/index';
 
@@ -25,10 +28,11 @@ vi.mock('node:child_process', () => ({
 describe('runUnitTestsPipeline Orchestrator', () => {
   const testEnv = setupOrchestratorTestContext();
 
-  it('should successfully trigger vitest with correct configuration path parameters', () => {
+  it('should fall back to the shared crew-cli config when the package has no local config', () => {
     testEnv.mockAllSuccessful();
 
-    const success = runUnitTestsPipeline(mockWorkspaceContext, ['--watch=false']);
+    // The mocked package directory does not exist, so no local config can be present
+    const success = runUnitTestsPipeline(mockWorkspaceContext, []);
 
     expect(success).toBe(true);
     expect(process.exitCode).toBe(0);
@@ -41,12 +45,43 @@ describe('runUnitTestsPipeline Orchestrator', () => {
         'run',
         '-c',
         expect.stringContaining('test-unit/lib/vitest.config.js'),
-        '--watch=false'
       ],
       expect.objectContaining({
         cwd: mockWorkspaceContext.packageDir,
       })
     );
+  });
+
+  it('should let Vitest auto-discover a local vitest config instead of forcing the shared one', () => {
+    const tempPackageDir = fs.mkdtempSync(path.join(os.tmpdir(), 'crew-test-unit-'));
+
+    try {
+      fs.writeFileSync(path.join(tempPackageDir, 'vitest.config.ts'), 'export default {};\n');
+      const localConfigContext = { ...mockWorkspaceContext, packageDir: tempPackageDir };
+
+      testEnv.mockAllSuccessful();
+      const success = runUnitTestsPipeline(localConfigContext, []);
+
+      expect(success).toBe(true);
+
+      const forwardedArgs = (spawnSync as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as string[];
+      expect(forwardedArgs).toEqual(['vitest', 'run']);
+      expect(forwardedArgs).not.toContain('-c');
+    } finally {
+      fs.rmSync(tempPackageDir, { recursive: true, force: true });
+    }
+  });
+
+  it('should defer to an explicit --config flag forwarded by the developer', () => {
+    testEnv.mockAllSuccessful();
+
+    const success = runUnitTestsPipeline(mockWorkspaceContext, ['--config', './my.config.ts']);
+
+    expect(success).toBe(true);
+
+    const forwardedArgs = (spawnSync as ReturnType<typeof vi.fn>).mock.calls[0]?.[1] as string[];
+    expect(forwardedArgs).toEqual(['vitest', 'run', '--config', './my.config.ts']);
+    expect(forwardedArgs).not.toContain('-c');
   });
 
   it('should forward multiple continuous testing flags without string concatenation errors', () => {

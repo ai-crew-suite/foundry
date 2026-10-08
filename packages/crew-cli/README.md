@@ -103,11 +103,28 @@ yarn turbo run build --filter=@ai-crew-suite/crew-cli
 
 This toolkit exposes zero-boilerplate configuration hooks directly to the monorepo ecosystem. For example, your master root-level configuration maps straight to the CLI's internal compiled code vectors using Yarn Workspaces link aliases:
 
-```javascript
+```typescript
 // eslint.config.js (At Monorepo Root)
 import { createFlatConfigForWorkspace } from '@ai-crew-suite/crew-cli';
 
 export default createFlatConfigForWorkspace();
+```
+
+## Extend Vitest config in a repo
+
+Extending the shared crew-cli Vitest config from a consuming package's local `vitest.config.ts`:
+
+```typescript
+import { defineConfig } from 'vitest/config';
+import { createCrewVitestConfig } from '@ai-crew-suite/crew-cli';
+
+export default defineConfig(
+  createCrewVitestConfig({
+    test: {
+      name: 'lint-architecture-custom-override',
+    },
+  }),
+);
 ```
 
 ## 🛟 Self-Linting Special Exception

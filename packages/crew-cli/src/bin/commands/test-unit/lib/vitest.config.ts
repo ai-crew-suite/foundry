@@ -13,36 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { defineConfig } from 'vitest/config';
-import { getWorkspaceContext } from '../../../utils/workspace';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { createCrewVitestConfig } from './configFactory';
 
-const context = getWorkspaceContext();
-const repoRoot = context.repoRoot;
+/**
+ * Shared default Vitest configuration shipped inside crew-cli's dist output.
+ *
+ * `crew test:unit` points Vitest at this module whenever the target package
+ * does not provide its own local `vitest.config.*`. Packages that need to
+ * customize the configuration should create a local `vitest.config.ts` that
+ * extends `createCrewVitestConfig` from the `@ai-crew-suite/crew-cli`
+ * programmatic API; `crew test:unit` automatically prefers the local config.
+ */
+export default createCrewVitestConfig();
 
-// Resolve setup.js relative to this config file's compiled location in
-// crew-cli's dist output, so the path stays valid regardless of the
-// crew-cli package's directory name.
-const configDir = path.dirname(fileURLToPath(import.meta.url));
-const setupFilePath = path.resolve(configDir, 'setup.js');
-const projectName = path.relative(repoRoot, context.packageDir).replace(/\//g, '-') || 'root-suite';
-
-export default defineConfig({
-  test: {
-    name: projectName,
-    globals: true,
-    environment: context.isBrowser ? 'jsdom' : 'node',
-    passWithNoTests: true,
-    setupFiles: [setupFilePath],
-    exclude: [
-      '**/node_modules/**',
-      '**/dist/**',
-      '**/e2e-tests/**',
-    ],
-    coverage: {
-      provider: 'v8',
-      reporter: ['text', 'json', 'html'],
-    },
-  },
-});
