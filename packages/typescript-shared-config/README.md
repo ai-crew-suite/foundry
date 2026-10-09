@@ -31,14 +31,14 @@ Create or edit local `tsconfig.json` files and point the `extends` directive to 
 Ensure your workspace extension selections map strictly to the verified entry points:
 
 - [ ] **@ai-crew-suite/typescript-shared-config**: Standard baseline options containing immutable constraints invariant across all targets.
-- [ ] **@ai-crew-suite/typescript-shared-config/node**: Tailored for backend microservices and agent execution layers (configures NodeNext resolution and targets dist/ compilation tracks).
+- [ ] **@ai-crew-suite/typescript-shared-config/node**: Tailored for backend microservices and agent execution layers (configures bundler-compatible resolution for ncc/esbuild/rollup toolchains and targets dist/ compilation tracks).
 - [ ] **@ai-crew-suite/typescript-shared-config/web**: Configured specifically for frontend packages, browser runtimes, and bundler compilation matrices (suppresses emissions via noEmit).
 
 ## Core Responsibilities
 
 - **Strict Mode Enforcement**: Locks down compiler options (strict, isolatedModules, esModuleInterop) to prevent runtime type bleeding and build escapes.
 - **Dynamic Context Resolution**: Leverages modern TypeScript ${configDir} routing to anchor source inputs, exclusions, and distribution output folders dynamically relative to the inheriting project's workspace.
-- **Target Optimization**: Segregates engine runtime requirements into decoupled target configurations for NodeNext/ES2022 runtimes and bundler-driven frontend environments.
+- **Target Optimization**: Segregates engine runtime requirements into decoupled target configurations for bundler-compiled ES2022 runtimes (ncc/esbuild/rollup) and bundler-driven frontend environments.
 
 ## Architectural Dependency Tree
 
