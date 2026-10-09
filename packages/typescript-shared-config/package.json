@@ -1,7 +1,7 @@
 {
   "name": "@ai-crew-suite/typescript-shared-config",
   "description": "Extensible and reusable TypeScript configurations.",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "license": "Apache-2.0",
   "keywords": [
     "ai-crew-suite",
