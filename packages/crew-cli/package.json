@@ -1,6 +1,6 @@
 {
   "name": "@ai-crew-suite/crew-cli",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "license": "Apache-2.0",
   "engines": {
     "node": "22 || 24"
@@ -47,12 +47,12 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@backstage/cli": "catalog:prod",
-    "@backstage/core-components": "catalog:prod",
-    "@backstage/core-plugin-api": "catalog:prod",
-    "@backstage/eslint-plugin": "catalog:prod",
-    "@backstage/test-utils": "catalog:prod",
-    "@backstage/theme": "catalog:prod",
+    "@backstage/cli": "backstage:^",
+    "@backstage/core-components": "backstage:^",
+    "@backstage/core-plugin-api": "backstage:^",
+    "@backstage/eslint-plugin": "backstage:^",
+    "@backstage/test-utils": "backstage:^",
+    "@backstage/theme": "backstage:^",
     "@material-ui/core": "catalog:prod",
     "@storybook/addon-docs": "catalog:prod",
     "@storybook/addon-links": "catalog:prod",

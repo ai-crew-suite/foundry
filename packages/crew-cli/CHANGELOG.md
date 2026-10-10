@@ -1,5 +1,11 @@
 # @ai-crew-suite/crew-cli
 
+## 0.0.6
+
+### Patch Changes
+
+- Change tsconfig preset to module: ESNext / moduleResolution: Bundler
+
 ## 0.0.5
 
 ### Patch Changes
