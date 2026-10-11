@@ -7,6 +7,5 @@
   "fixed": [],
   "ignore": [],
   "linked": [],
-  "publish": "yarn npm publish",
   "updateInternalDependencies": "patch"
 }

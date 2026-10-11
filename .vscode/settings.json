@@ -1,7 +1,12 @@
 {
   "cSpell.customDictionaries": {
+    "custom-words": {
+      "name": "custom-words",
+      "path": "${workspaceFolder}/cspell.json",
+      "addWords": true
+    },
     "org-words": {
-      "path": "./.cspell/shared.txt",
+      "path": "${workspaceFolder}/.cspell/shared.txt",
       "addWords": false
     }
   },
