@@ -64,6 +64,16 @@ export function createCrewVitestConfig(overrides: ViteUserConfig = {}): ViteUser
         provider: 'v8',
         reporter: ['text', 'json', 'html'],
       },
+      server: {
+        deps: {
+          // Forces Vitest to process these dependencies correctly during ESM execution
+          inline: [
+            '@backstage/plugin-catalog-react',
+            'material-ui-popup-state',
+            '@mui/material'
+          ],
+        },
+      },
     },
   });
 
