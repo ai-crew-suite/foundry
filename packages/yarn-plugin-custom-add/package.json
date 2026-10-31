@@ -36,12 +36,12 @@
   ],
   "scripts": {
     "build": "npm run clean && rollup -c rollup.config.ts --configPlugin esbuild",
-    "clean": "crew clean",
-    "lint": "crew lint",
+    "clean": "backstage-cli crew clean",
+    "lint": "backstage-cli crew lint",
     "test": "yarn test:unit && yarn test:integration",
     "test:unit": "vitest run --config vitest.config.ts",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "typecheck": "crew typecheck"
+    "typecheck": "backstage-cli crew typecheck"
   },
   "dependencies": {
     "@yarnpkg/core": "catalog:prod",
@@ -50,6 +50,7 @@
   },
   "devDependencies": {
     "@ai-crew-suite/crew-cli": "workspace:*",
+    "@backstage/cli": "backstage:^",
     "@rollup/plugin-commonjs": "catalog:dev",
     "@rollup/plugin-json": "catalog:dev",
     "@types/npm-package-arg": "catalog:dev",

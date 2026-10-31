@@ -2,13 +2,25 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "./tsconfig.base.json",
   "files": [],
-  "include": ["packages/**/*"],
+  "include": ["packages*"],
   "references": [
-    { "path": "./packages/backstage-config-typegen" },
-    { "path": "./packages/canonical-repo-assets" },
-    { "path": "./packages/crew-cli" },
-    { "path": "./packages/renovate-shared-config" },
-    { "path": "./packages/typescript-shared-config" },
-    { "path": "./packages/yarn-plugin-custom-add" }
+    {
+      "path": "./packages/backstage-config-typegen"
+    },
+    {
+      "path": "./packages/canonical-repo-assets"
+    },
+    {
+      "path": "./packages/crew-cli"
+    },
+    {
+      "path": "./packages/renovate-shared-config"
+    },
+    {
+      "path": "./packages/typescript-shared-config"
+    },
+    {
+      "path": "./packages/yarn-plugin-custom-add"
+    }
   ]
 }

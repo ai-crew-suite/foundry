@@ -17,6 +17,7 @@ __metadata:
   resolution: "@ai-crew-suite/backstage-config-typegen@workspace:packages/backstage-config-typegen"
   dependencies:
     "@ai-crew-suite/crew-cli": "workspace:*"
+    "@backstage/cli": "backstage:^"
     "@types/node": "catalog:dev"
     esbuild: "catalog:dev"
     rollup: "catalog:dev"
@@ -143,6 +144,7 @@ __metadata:
   resolution: "@ai-crew-suite/typescript-shared-config@workspace:packages/typescript-shared-config"
   dependencies:
     "@ai-crew-suite/crew-cli": "workspace:*"
+    "@backstage/cli": "backstage:^"
     prettier: "catalog:dev"
     tsx: "catalog:dev"
     typescript: "catalog:dev"
@@ -155,6 +157,7 @@ __metadata:
   resolution: "@ai-crew-suite/yarn-plugin-custom-add@workspace:packages/yarn-plugin-custom-add"
   dependencies:
     "@ai-crew-suite/crew-cli": "workspace:*"
+    "@backstage/cli": "backstage:^"
     "@rollup/plugin-commonjs": "catalog:dev"
     "@rollup/plugin-json": "catalog:dev"
     "@types/npm-package-arg": "catalog:dev"
