@@ -96,6 +96,6 @@ export function runBuildPipeline(context: WorkspaceContext, forwardedArgs: strin
     cwd: context.packageDir,
   });
 
-  process.exitCode = buildResult.status ?? 0;
+  process.exitCode = buildResult.status ?? 1;
   return buildResult.status === 0;
 }

@@ -16,3 +16,4 @@
 export { createFlatConfigForWorkspace } from './bin/commands/lint/config/factory';
 export { createCrewVitestConfig } from './bin/commands/test-unit/lib/configFactory';
 export * from './bin/commands/storybook/lib/mockUtils';
+export { default } from './cliModule';

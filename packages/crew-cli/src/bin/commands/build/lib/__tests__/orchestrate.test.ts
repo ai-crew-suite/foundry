@@ -90,4 +90,11 @@ describe('runBuildPipeline Orchestrator', () => {
     expect(process.exitCode).toBe(2);
     expect(spawnSync).toHaveBeenCalledTimes(1); // Blocked early from running step 2
   });
+
+  it('reports a signal-terminated Backstage build as a failure', () => {
+    testEnv.mockSequenceStatuses(0, 0, 0, 0, null);
+
+    expect(runBuildPipeline(mockWorkspaceContext, [])).toBe(false);
+    expect(process.exitCode).toBe(1);
+  });
 });

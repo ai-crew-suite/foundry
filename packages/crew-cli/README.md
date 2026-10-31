@@ -6,24 +6,31 @@ By managing tooling constraints centrally within this package, we can upgrade, p
 
 ## 🚀 Consuming this Toolbelt
 
-Every package in the monorepo utilizes the uniform `crew` binary interface. To configure a child workspace, simply link the tool and expose its sub-commands within the package's local `package.json`:
+Install `@ai-crew-suite/crew-cli` and `@backstage/cli` as dependencies of the
+monorepo root. The root must also include `@backstage/cli-defaults` (or the
+individual Backstage CLI modules it needs). Backstage discovers Crew from the
+root dependencies; installing it only in a child workspace is not sufficient.
+Build the Crew package before using it when it is a local workspace.
+
+The commands are available under `backstage-cli crew`, avoiding collisions with
+Backstage's own commands. For example, a child workspace can configure:
 
 ```json
 {
   "name": "@ai-crew-suite/my-frontend-plugin",
   "scripts": {
-    "build": "crew build",
-    "clean": "crew clean",
-    "lint": "crew lint",
-    "test:unit:coverage": "crew test:unit:coverage",
-    "test:unit": "crew test:unit",
-    "typecheck": "crew typecheck"
-  },
-  "devDependencies": {
-    "@ai-crew-suite/crew-cli": "workspace:*"
+    "build": "backstage-cli crew build",
+    "clean": "backstage-cli crew clean",
+    "lint": "backstage-cli crew lint",
+    "test:unit:coverage": "backstage-cli crew test:unit:coverage",
+    "test:unit": "backstage-cli crew test:unit",
+    "typecheck": "backstage-cli crew typecheck"
   }
 }
 ```
+
+The existing `crew` binary remains available for compatibility with existing
+scripts. Both entrypoints run the same underlying pipelines.
 
 ## 🏛️ Core Features & Architecture
 
@@ -54,13 +61,13 @@ The toolbelt architecture is constructed following modern, deterministic executi
 
 ## 🛠️ The Global Command Matrix
 
-Run any command using `crew <command>` from within a package folder, or target it globally through Turborepo. All native command flags are transparently passed down directly to the underlying compiler engines:
+Run any command using `backstage-cli crew <command>` from within a package folder, or target it globally through Turborepo. Options are passed to the underlying compiler engines:
 
 ```bash
 # Examples of transparent flag forwarding
-crew typecheck --watch
-crew test:unit --update
-crew lint --fix
+backstage-cli crew typecheck --watch
+backstage-cli crew test:unit --update
+backstage-cli crew lint --fix
 ```
 
 | Sub-command                   | Purpose                                                                       | Cache Policy              |
@@ -86,6 +93,14 @@ When actively refactoring or changing the CLI package itself, Vitest and `tsx` b
 ```bash
 yarn turbo run test:unit --filter=@ai-crew-suite/crew-cli
 ```
+
+### Verify discovery in an isolated consuming monorepo
+
+```bash
+yarn workspace @ai-crew-suite/crew-cli test:integration
+```
+
+This builds the package before exercising the installed Backstage CLI.
 
 ### Run local code-coverage metric scans against the CLI package
 
@@ -125,16 +140,6 @@ export default defineConfig(
     },
   }),
 );
-```
-
-## 🛟 Self-Linting Special Exception
-
-Because a node package cannot safely invoke its own uncompiled workspace binary hook while running clean cycles on its own files, the CLI uses a localized direct file pointer to trigger its code validation passes:
-
-```json
-"scripts": {
-  "lint": "node ./dist/bin/crew.js lint"
-}
 ```
 
 ### Compliance and Licensing

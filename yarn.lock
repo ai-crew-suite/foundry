@@ -40,6 +40,8 @@ __metadata:
   resolution: "@ai-crew-suite/crew-cli@workspace:packages/crew-cli"
   dependencies:
     "@backstage/cli": "backstage:^"
+    "@backstage/cli-common": "npm:^0.3.1"
+    "@backstage/cli-node": "npm:^0.3.4"
     "@backstage/core-components": "backstage:^"
     "@backstage/core-plugin-api": "backstage:^"
     "@backstage/eslint-plugin": "backstage:^"
@@ -7050,44 +7052,44 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@turbo/darwin-64@npm:2.11.7":
-  version: 2.11.7
-  resolution: "@turbo/darwin-64@npm:2.11.7"
+"@turbo/darwin-64@npm:2.11.10":
+  version: 2.11.10
+  resolution: "@turbo/darwin-64@npm:2.11.10"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@turbo/darwin-arm64@npm:2.11.7":
-  version: 2.11.7
-  resolution: "@turbo/darwin-arm64@npm:2.11.7"
+"@turbo/darwin-arm64@npm:2.11.10":
+  version: 2.11.10
+  resolution: "@turbo/darwin-arm64@npm:2.11.10"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@turbo/linux-64@npm:2.11.7":
-  version: 2.11.7
-  resolution: "@turbo/linux-64@npm:2.11.7"
+"@turbo/linux-64@npm:2.11.10":
+  version: 2.11.10
+  resolution: "@turbo/linux-64@npm:2.11.10"
   conditions: (os=android | os=linux) & cpu=x64
   languageName: node
   linkType: hard
 
-"@turbo/linux-arm64@npm:2.11.7":
-  version: 2.11.7
-  resolution: "@turbo/linux-arm64@npm:2.11.7"
+"@turbo/linux-arm64@npm:2.11.10":
+  version: 2.11.10
+  resolution: "@turbo/linux-arm64@npm:2.11.10"
   conditions: (os=android | os=linux) & cpu=arm64
   languageName: node
   linkType: hard
 
-"@turbo/windows-64@npm:2.11.7":
-  version: 2.11.7
-  resolution: "@turbo/windows-64@npm:2.11.7"
+"@turbo/windows-64@npm:2.11.10":
+  version: 2.11.10
+  resolution: "@turbo/windows-64@npm:2.11.10"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
 
-"@turbo/windows-arm64@npm:2.11.7":
-  version: 2.11.7
-  resolution: "@turbo/windows-arm64@npm:2.11.7"
+"@turbo/windows-arm64@npm:2.11.10":
+  version: 2.11.10
+  resolution: "@turbo/windows-arm64@npm:2.11.10"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
@@ -24346,16 +24348,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo@npm:^2.11.7":
-  version: 2.11.7
-  resolution: "turbo@npm:2.11.7"
+"turbo@npm:^2.11.8":
+  version: 2.11.10
+  resolution: "turbo@npm:2.11.10"
   dependencies:
-    "@turbo/darwin-64": "npm:2.11.7"
-    "@turbo/darwin-arm64": "npm:2.11.7"
-    "@turbo/linux-64": "npm:2.11.7"
-    "@turbo/linux-arm64": "npm:2.11.7"
-    "@turbo/windows-64": "npm:2.11.7"
-    "@turbo/windows-arm64": "npm:2.11.7"
+    "@turbo/darwin-64": "npm:2.11.10"
+    "@turbo/darwin-arm64": "npm:2.11.10"
+    "@turbo/linux-64": "npm:2.11.10"
+    "@turbo/linux-arm64": "npm:2.11.10"
+    "@turbo/windows-64": "npm:2.11.10"
+    "@turbo/windows-arm64": "npm:2.11.10"
   dependenciesMeta:
     "@turbo/darwin-64":
       optional: true
@@ -24371,7 +24373,7 @@ __metadata:
       optional: true
   bin:
     turbo: bin/turbo
-  checksum: 10c0/42ad4f562a10b5f18be19dd13d24dec9276696818258ce5f31acbd507a8dfbdfab7bcee275b8b9c7f5446fde6549b90200950d7456f32042d604774338e6168a
+  checksum: 10c0/8a6ec1d42251c96749953398739a4d005fd88e882c9f4cf0b9a4367259ba427320088bb67fc6fe3235a1e983ebaab992d35a163b8f1b03d6632101b2da581f15
   languageName: node
   linkType: hard
 

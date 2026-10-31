@@ -47,7 +47,7 @@ export function setupOrchestratorTestContext() {
   });
 
   return {
-    mockSequenceStatuses(...statuses: number[]) {
+    mockSequenceStatuses(...statuses: (number | null)[]) {
       for (const status of statuses) {
         (spawnSync as any).mockReturnValueOnce({ status });
       }
