@@ -5,12 +5,12 @@
     "build": {
       "cache": true,
       "dependsOn": [],
-      "inputs": ["src/**", "package.json"],
+      "inputs": ["src/**", "package.json", "rollup.config.ts", "tsconfig.json"],
       "outputs": ["dist/**"]
     },
     /**
-     * Crew CLI's own clean removes dist/, which is where the `crew` bin shim
-     * that all sibling packages' `crew clean` scripts execute lives. It must
+     * Crew CLI's own clean removes the module in dist/ that sibling
+     * packages' `backstage-cli crew clean` scripts load. It must
      * wait until every sibling clean task has completed to avoid a race that
      * fails them with MODULE_NOT_FOUND.
      */

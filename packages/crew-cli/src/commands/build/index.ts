@@ -13,31 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { getWorkspaceContext } from '../../utils/workspace';
 import { runBuildPipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('build')
-  .description('Compile workspace distributions using the Backstage compiler runtime')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const context = getWorkspaceContext();
-      const forwardedArgs = process.argv.slice(3);
-      const success = runBuildPipeline(context, forwardedArgs);
-
-      if (!success) {
-        // Since you opted to avoid process.exit globally, return gracefully.
-        // Node will automatically shut down with this exit code once the execution queue drops.
-        return;
-      }
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core build orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the build pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runBuildPipeline(getWorkspaceContext(), args));

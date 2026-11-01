@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { getWorkspaceContext } from '../../utils/workspace';
 import { runFormatPipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('format')
-  .description('Run automated text style formatting across the workspace layout via Prettier')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const context = getWorkspaceContext();
-      const forwardedArgs = process.argv.slice(3);
-
-      runFormatPipeline(context, forwardedArgs);
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core format orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the format pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runFormatPipeline(getWorkspaceContext(), args));

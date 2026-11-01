@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { getWorkspaceContext } from '../../utils/workspace';
 import { runUnitCoveragePipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('test:unit:coverage')
-  .description('Execute package unit tests matrix and write coverage metric distribution files')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const context = getWorkspaceContext();
-      const forwardedArgs = process.argv.slice(3);
-
-      runUnitCoveragePipeline(context, forwardedArgs);
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core test-unit-coverage orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the test-unit-coverage pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runUnitCoveragePipeline(getWorkspaceContext(), args));

@@ -1,6 +1,6 @@
 {
   "name": "@ai-crew-suite/crew-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "license": "Apache-2.0",
   "engines": {
     "node": "22 || 24"
@@ -27,9 +27,6 @@
   },
   "backstage": {
     "role": "cli-module"
-  },
-  "bin": {
-    "crew": "./dist/bin/crew.js"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -70,7 +67,6 @@
     "@typescript-eslint/parser": "catalog:prod",
     "@vitest/coverage-v8": "catalog:prod",
     "chalk": "catalog:prod",
-    "commander": "catalog:prod",
     "eslint": "catalog:prod",
     "eslint-config-prettier": "catalog:prod",
     "eslint-plugin-header": "catalog:prod",

@@ -1,6 +1,6 @@
 # 🧰 AI Crew Suite CLI & Developer Toolbelt
 
-This package is the centralized developer toolbelt and workspace orchestrator for use in AI Crew Suite repos. It consolidates all building, cleaning, linting, typechecking, and testing workflows into a single, high-performance binary utility.
+This Backstage CLI module provides the centralized developer toolbelt and workspace orchestrator for AI Crew Suite repos.
 
 By managing tooling constraints centrally within this package, we can upgrade, patch, or alter repo-wide build steps without touching or changing individual package script blocks across our 60+ workspaces.
 
@@ -13,7 +13,8 @@ root dependencies; installing it only in a child workspace is not sufficient.
 Build the Crew package before using it when it is a local workspace.
 
 The commands are available under `backstage-cli crew`, avoiding collisions with
-Backstage's own commands. For example, a child workspace can configure:
+Backstage's own commands. Yarn workspaces should also declare `@backstage/cli`
+as a development dependency so its binary is available to their scripts. For example:
 
 ```json
 {
@@ -25,12 +26,16 @@ Backstage's own commands. For example, a child workspace can configure:
     "test:unit:coverage": "backstage-cli crew test:unit:coverage",
     "test:unit": "backstage-cli crew test:unit",
     "typecheck": "backstage-cli crew typecheck"
+  },
+  "devDependencies": {
+    "@ai-crew-suite/crew-cli": "workspace:*",
+    "@backstage/cli": "backstage:^"
   }
 }
 ```
 
-The existing `crew` binary remains available for compatibility with existing
-scripts. Both entrypoints run the same underlying pipelines.
+The standalone `crew` binary is no longer provided. Use `backstage-cli crew`
+instead.
 
 ## 🏛️ Core Features & Architecture
 
@@ -61,7 +66,7 @@ The toolbelt architecture is constructed following modern, deterministic executi
 
 ## 🛠️ The Global Command Matrix
 
-Run any command using `backstage-cli crew <command>` from within a package folder, or target it globally through Turborepo. Options are passed to the underlying compiler engines:
+Run any command using `backstage-cli crew <command>` from within a package folder, or target it globally through Turborepo. The table below lists command paths after `backstage-cli`; options are passed to the underlying compiler engines:
 
 ```bash
 # Examples of transparent flag forwarding

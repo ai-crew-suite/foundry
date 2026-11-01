@@ -1,5 +1,11 @@
 # @ai-crew-suite/typescript-shared-config
 
+## 0.0.6
+
+### Patch Changes
+
+- Fix crew-cli subcommand registrations to backstage-cli
+
 ## 0.0.5
 
 ### Patch Changes

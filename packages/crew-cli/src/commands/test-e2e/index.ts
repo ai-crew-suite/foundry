@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { getWorkspaceContext } from '../../utils/workspace';
 import { runE2EPipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('test:e2e')
-  .description('Run end-to-end integration tests via Playwright')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const context = getWorkspaceContext();
-      const forwardedArgs = process.argv.slice(3);
-
-      runE2EPipeline(context, forwardedArgs);
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core test-e2e orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the test-e2e pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runE2EPipeline(getWorkspaceContext(), args));

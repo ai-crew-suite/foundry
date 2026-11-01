@@ -18,9 +18,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 /**
- * This Vitest config is only for the @ai-crew-suite/cli package. It
- * avoids a chicken-and-egg problem of running tests on the test:unit
- * Commander task during development of that
+ * This configuration allows the CLI package to test itself without invoking
+ * its own compiled command.
  */
 const __filename = fileURLToPath(import.meta.url);
 const currentDir = path.dirname(__filename);
@@ -36,8 +35,8 @@ export default defineConfig({
     // Use path aliases to ensure that '.js' file extensions in source
     // imports map natively to real source '.ts' files during live test runs
     alias: {
-      '../../utils/workspace.js': path.resolve(currentDir, 'src/bin/utils/workspace.ts'),
-      '../utils/workspace.js': path.resolve(currentDir, 'src/bin/utils/workspace.ts'),
+      '../../utils/workspace.js': path.resolve(currentDir, 'src/utils/workspace.ts'),
+      '../utils/workspace.js': path.resolve(currentDir, 'src/utils/workspace.ts'),
     },
     coverage: {
       provider: 'v8',

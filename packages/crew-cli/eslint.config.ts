@@ -54,8 +54,8 @@ export default tseslint.config(
   {
     name: "crew-cli/test-overrides",
     files: [
-      "src/bin/commands/test-unit/lib/setup.ts",
-      "src/bin/utils/test-utils.ts",
+      "src/commands/test-unit/lib/setup.ts",
+      "src/utils/test-utils.ts",
       "**/*.test.ts",
       "**/__tests__/**/*.ts"
     ],

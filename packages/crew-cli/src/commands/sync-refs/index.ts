@@ -13,27 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
-import chalk from 'chalk';
+import type { CliCommandContext } from '@backstage/cli-node';
+import { noArgs } from '../../utils/command';
 import { syncProjectReferences } from './lib/sync';
 
-const program = new Command();
-
-program
-  .name('sync:refs')
-  .description('Synchronize all TypeScript package project references and heal the root configuration')
-  .action(() => {
-    try {
-      console.log(`\n${chalk.blue('🔄 AI CREW SUITE: Healing monorepo TypeScript project references...')}`);
-
-      syncProjectReferences();
-
-      console.log(`${chalk.green('✅ Project reference mappings aligned perfectly!')}\n`);
-      process.exitCode = 0;
-    } catch (error) {
-      console.error(chalk.red('❌ Core reference sync orchestration framework error:'), error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Synchronizes the repository's TypeScript project references. */
+export default async function execute(context: CliCommandContext): Promise<void> {
+  if (!noArgs(context)) return;
+  syncProjectReferences();
+  console.log('TypeScript project references synchronized.');
+}

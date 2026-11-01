@@ -114,6 +114,6 @@ describe('runStorybookBuildPipeline Orchestrator', () => {
 
     // Guard assertion: The directory mapping context must resolve as an absolute path, not a relative path literal
     expect(configDirValue).not.toContain('..');
-    expect(configDirValue).toSatisfy((val: string) => val.endsWith('packages/crew-cli/src/bin/commands/storybook/config'));
+    expect(configDirValue).toSatisfy((val: string) => val.endsWith('packages/crew-cli/src/commands/storybook/config'));
   });
 });

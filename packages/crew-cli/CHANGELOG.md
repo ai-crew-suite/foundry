@@ -1,5 +1,11 @@
 # @ai-crew-suite/crew-cli
 
+## 1.0.1
+
+### Patch Changes
+
+- Fix crew-cli subcommand registrations to backstage-cli
+
 ## 1.0.0
 
 ### Major Changes

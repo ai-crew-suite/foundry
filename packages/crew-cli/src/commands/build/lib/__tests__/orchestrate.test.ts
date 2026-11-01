@@ -41,17 +41,16 @@ describe('runBuildPipeline Orchestrator', () => {
     // 1. Pre-build clean cycle
     expect(spawnSync).toHaveBeenNthCalledWith(
       1,
-      'node',
-      // The main CLI binary must resolve to <pkg>/(src|dist)/bin/crew.js, never a nonexistent sibling like dist/crew.js
-      [expect.stringMatching(/(?:^|.*[\\/])bin[\\/]crew\.js$/), 'clean'],
+      process.execPath,
+      [expect.stringContaining('backstage-cli'), 'crew', 'clean'],
       expect.objectContaining({ cwd: mockWorkspaceContext.packageDir })
     );
 
     // 2. Reference synchronization
     expect(spawnSync).toHaveBeenNthCalledWith(
       2,
-      'node',
-      [expect.stringMatching(/(?:^|.*[\\/])bin[\\/]crew\.js$/), 'sync:refs'],
+      process.execPath,
+      [expect.stringContaining('backstage-cli'), 'crew', 'sync:refs'],
       expect.objectContaining({ cwd: mockWorkspaceContext.packageDir })
     );
 

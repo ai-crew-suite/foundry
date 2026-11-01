@@ -93,13 +93,32 @@ describe('Backstage CLI module in a consumer monorepo', () => {
     expect(result.stdout + result.stderr).toContain('--invalid-crew-test-flag');
   });
 
+  it('runs build prerequisites through Backstage without a standalone Crew binary', () => {
+    fs.mkdirSync(path.join(workspace, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(workspace, 'src', 'index.ts'), 'export const value = 1;\n');
+    fs.writeFileSync(path.join(workspace, 'tsconfig.json'), JSON.stringify({
+      compilerOptions: { composite: true, declaration: true, types: [], outDir: 'dist' },
+      include: ['src'],
+    }));
+
+    const result = runCli(workspace, 'crew', 'build', '--help', '--unused');
+    expect(result.status, result.stdout + result.stderr).toBe(0);
+    expect(result.stdout).toContain('Analyzing internal dependency graphs');
+    expect(result.stdout).toContain('backstage-cli package build');
+  });
+
   it('rejects invalid arguments and displays command help', () => {
     const invalid = runCli(workspace, 'crew', 'clean', '--invalid');
     expect(invalid.status).not.toBe(0);
     expect(invalid.stderr).toContain('Unexpected arguments');
 
-    const help = runCli(workspace, 'crew', 'typecheck', '--help');
-    expect(help.status, help.stderr).toBe(0);
-    expect(help.stdout).toContain('backstage-cli crew typecheck');
+    for (const command of [
+      'build', 'clean', 'format', 'lint', 'publish', 'storybook', 'storybook:build',
+      'sync:refs', 'test:e2e', 'test:unit', 'test:unit:coverage', 'typecheck',
+    ]) {
+      const help = runCli(workspace, 'crew', command, '--help');
+      expect(help.status, help.stderr).toBe(0);
+      expect(help.stdout).toContain(`backstage-cli crew ${command}`);
+    }
   });
 });

@@ -13,33 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import type { CliCommandContext } from '@backstage/cli-node';
+import { noArgs } from '../../utils/command';
 import { getWorkspaceContext } from '../../utils/workspace';
 import { cleanWorkspace } from './lib/clean';
 
-const program = new Command();
-
-program
-  .name('clean')
-  .description('Wipe local build artifacts and distribution directories')
-  .action(() => {
-    console.log(`\x1b[34m🧹 Cleaning target workspace:\x1b[0m ${process.cwd()}`);
-
-    try {
-      const { removed } = cleanWorkspace(getWorkspaceContext());
-
-      if (removed.length === 0) {
-        console.log('\x1b[90m🛈\u2003 No build artifacts found. Skipping clean.\x1b[0m');
-      } else {
-        for (const target of removed) {
-          console.log(`\x1b[32m✅ Successfully removed:\x1b[0m ${target}`);
-        }
-      }
-    } catch (error) {
-      console.error(`\x1b[31m❌ Failed to clear distribution directory:\x1b[0m`, error);
-      process.exitCode = 1;
-      return;
-    }
-  });
-
-program.parse(process.argv);
+/** Cleans the current workspace. */
+export default async function execute(context: CliCommandContext): Promise<void> {
+  if (!noArgs(context)) return;
+  const { removed } = cleanWorkspace(getWorkspaceContext());
+  if (removed.length === 0) console.log('No build artifacts found.');
+  for (const target of removed) console.log(`Removed: ${target}`);
+}

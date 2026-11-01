@@ -1,7 +1,7 @@
 {
   "name": "@ai-crew-suite/backstage-config-typegen",
   "description": "CLI that synchronizes Backstage config.d.ts schema types into a plugin's runtime source tree",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "license": "Apache-2.0",
   "keywords": [

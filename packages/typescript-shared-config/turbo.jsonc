@@ -1,7 +1,7 @@
 {
   "extends": ["//"],
   "tasks": {
-    /** Build requires crew-cli's dist/ because the build script invokes `crew clean`. */
+    /** Build requires crew-cli's dist/ because the build script invokes `backstage-cli crew clean`. */
     "build": {
       "cache": true,
       "dependsOn": ["@ai-crew-suite/crew-cli#build"]

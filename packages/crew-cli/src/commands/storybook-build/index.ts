@@ -13,23 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { runStorybookBuildPipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('storybook:build')
-  .description('Compile a static distribution build of the workspace documentation stories')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const forwardedArgs = process.argv.slice(3);
-      runStorybookBuildPipeline(forwardedArgs);
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core storybook-build orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the storybook-build pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runStorybookBuildPipeline(args));

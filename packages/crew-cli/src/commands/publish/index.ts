@@ -13,23 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { runPublishPipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('publish')
-  .description('Orchestrate workspace npm releases using Changesets')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const forwardedArgs = process.argv.slice(3);
-      runPublishPipeline(forwardedArgs);
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core publish orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the publish pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runPublishPipeline(args));

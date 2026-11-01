@@ -61,7 +61,6 @@ __metadata:
     "@typescript-eslint/parser": "catalog:prod"
     "@vitest/coverage-v8": "catalog:prod"
     chalk: "catalog:prod"
-    commander: "catalog:prod"
     esbuild: "catalog:dev"
     eslint: "catalog:prod"
     eslint-config-prettier: "catalog:prod"
@@ -92,8 +91,6 @@ __metadata:
     vite: "catalog:prod"
     vite-plugin-tsconfig-paths: "catalog:prod"
     vitest: "catalog:prod"
-  bin:
-    crew: ./dist/bin/crew.js
   languageName: unknown
   linkType: soft
 
@@ -10756,7 +10753,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:15.0.0, commander@npm:^15.0.0":
+"commander@npm:15.0.0":
   version: 15.0.0
   resolution: "commander@npm:15.0.0"
   checksum: 10c0/539229c171914ea1ccd45ee5f10d924289a12a684ea3a7a44147abe54003c35ed6de9ae4ad198d88c29fdf403dca0428451a388234e6dc01b6faa978fb207206

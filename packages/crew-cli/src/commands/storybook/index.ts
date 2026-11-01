@@ -13,26 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Command } from 'commander';
+import { pipelineCommand } from '../../utils/command';
 import { getWorkspaceContext } from '../../utils/workspace';
 import { runStorybookPipeline } from './lib/orchestrate';
 
-const program = new Command();
-
-program
-  .name('storybook')
-  .description('Boot up the consolidated interactive Storybook documentation server')
-  .allowUnknownOption(true)
-  .action(() => {
-    try {
-      const context = getWorkspaceContext();
-      const forwardedArgs = process.argv.slice(3);
-
-      runStorybookPipeline(context, forwardedArgs);
-    } catch (error) {
-      console.error(`\x1b[31m❌ Core storybook orchestration framework error:\x1b[0m`, error);
-      process.exitCode = 1;
-    }
-  });
-
-program.parse(process.argv);
+/** Runs the storybook pipeline as a Backstage CLI command. */
+export default pipelineCommand(args => runStorybookPipeline(getWorkspaceContext(), args));

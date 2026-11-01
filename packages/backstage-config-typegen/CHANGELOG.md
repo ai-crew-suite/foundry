@@ -1,5 +1,11 @@
 # @ai-crew-suite/backstage-config-typegen
 
+## 0.1.1
+
+### Patch Changes
+
+- Fix crew-cli subcommand registrations to backstage-cli
+
 ## 0.1.0
 
 ### Minor Changes
