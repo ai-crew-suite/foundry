@@ -7,5 +7,5 @@
     "integration/**/*.ts",
     "rollup.config.ts",
     "vitest.integration.config.ts"
-  ]
+, "crew.ts"  ]
 }
