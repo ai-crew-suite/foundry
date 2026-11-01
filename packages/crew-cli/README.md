@@ -97,7 +97,7 @@ yarn turbo run test:unit --filter=@ai-crew-suite/crew-cli
 ### Verify discovery in an isolated consuming monorepo
 
 ```bash
-yarn workspace @ai-crew-suite/crew-cli test:integration
+yarn turbo run test:integration --filter=@ai-crew-suite/crew-cli
 ```
 
 This builds the package before exercising the installed Backstage CLI.

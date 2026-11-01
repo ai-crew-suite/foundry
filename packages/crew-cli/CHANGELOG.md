@@ -1,5 +1,11 @@
 # @ai-crew-suite/crew-cli
 
+## 1.0.0
+
+### Major Changes
+
+- 407bede: Refactor crew-cli to be a cli-module extension to the backstage-cli
+
 ## 0.0.6
 
 ### Patch Changes

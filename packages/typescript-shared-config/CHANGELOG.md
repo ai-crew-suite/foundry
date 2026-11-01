@@ -1,5 +1,11 @@
 # @ai-crew-suite/typescript-shared-config
 
+## 0.0.5
+
+### Patch Changes
+
+- 407bede: Refactor crew-cli to be a cli-module extension to the backstage-cli
+
 ## 0.0.4
 
 ### Patch Changes
